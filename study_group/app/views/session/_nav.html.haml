@@ -1,0 +1,20 @@
+%nav{:class => "navbar navbar-inverse", :role => "navigation"}
+    %div{:class => "navbar-header"}
+        %button{:type => "button", :class =>"navbar-toggle", "data-toggle" => "collapse", "data-target" => "#bs-example-navbar-collapse-1"}
+            %span{:class => "sr-only"} Toggle navigation
+            %span{:class => "icon-bar"}
+            %span{:class => "icon-bar"}
+            %span{:class => "icon-bar"}
+        %div{:class=> "brand"}Enana
+    %div{:class => "collapse navbar-collapse", :id =>"bs-example-navbar-collapse-1"}
+        %ul{:class => "nav navbar-nav"}
+            %li= link_to 'About', '/about'
+            -if @current_user
+                %li= link_to 'Dashboard', '/home'
+                %li= link_to 'Logout', logout_path
+            -else
+                %li= link_to 'Login', root_path
+        -if @current_user
+            %p{:class => "navbar-text navbar-right"}Welcome, #{@current_user.name}!
+        -else
+            %p{:class => "navbar-text navbar-right"}Hello stranger.
