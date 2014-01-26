@@ -4,14 +4,15 @@ StudyGroup
 Ruby on Rails web app that communicates with an Android app <br>
 The Heroku application can be found <a href = "http://study-group-creator.herokuapp.com/">here</a>.
 
-First Milestone
+First Milestone 
 ---------------
 * Android app authenticates the user if they are using the app for the first time
 * Android app goes to myUH and gets the class names and class times of the user
 * Android app displays classes and times in a ListView
+ * This information will be persisted 
 * Android app stores a boolean that reflects if a user is a new user or not
 
-Second Milestone
+Second Milestone 
 ----------------
 * Write an API using JSON
   * Android app sends how much people want in the group, user name and password to the web app
@@ -37,9 +38,10 @@ Third Milestone
 Once specified number of people join a group, a notification is sent to people who didn't respond that the group
 has already been filled
 
-Fourth Milestone
+Fourth Milestone 
 -----------------
 * People who are in the group get a notification that based on their schedules, these times are available
+ * Times will be determined by the web app 
 * People in the group vote on a set time
   * Once a person sends a response, it gets sent to the web app
     * Web app sends a notification to the app that shows who responded and at what time (this will be displayed in a activity, in percentages)
