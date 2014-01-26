@@ -10,6 +10,5 @@ module StudyGroup
   class Application < Rails::Application
     #add it for the asset pipeline compatibility
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
-    config.assets.initialize_on_precompile = false
   end
 end
