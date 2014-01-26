@@ -15,7 +15,7 @@ First Milestone
 Second Milestone 
 ----------------
 * Write an API using JSON
-  * Android app sends how much people want in the group, user name and password to the web app
+  * Android app sends how many people the user wants in their group, user name and password to the web app
     * Web app gets name of people in the class from Laulima
   * Web app sends notifications to people on the list
     * First checks to see if they are a StudyGroup user
