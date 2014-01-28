@@ -6,7 +6,7 @@ The Heroku application can be found <a href = "http://study-group-creator.heroku
 
 First Milestone 
 ---------------
-* Android app authenticates the user if they are using the app for the first time
+* ~~Android app authenticates the user if they are using the app for the first time~~
 * Android app goes to myUH and gets the class names and class times of the user
 * Android app displays classes and times in a ListView
  * This information will be persisted 
