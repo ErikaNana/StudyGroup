@@ -1,0 +1,124 @@
+$headings-font-family: Helvetica, Arial;
+$font-family-sans-serif: Helvetica, Arial;
+$font-family-base: sans-serif;
+$font-size: 16px;
+/* $table-bg-accent:
+$table-border-color: */
+@import "bootstrap";
+
+/* Universal styling for all pages */
+html {
+    overflow-y: scroll;
+}
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin-right: 60px;
+    margin-left: 60px;
+}
+section{
+    overlow:auto;
+}
+textarea{
+    resize: vertical;
+}
+.center{
+    text-align: center;
+}
+
+/* typography */
+
+h1{
+  text-align: center;
+}
+
+div {
+  font-size: 16px;
+
+}
+li#userName {
+    color: white;
+}
+.navbar-header a{
+    text-decoration: none;
+    color: #0EBFE9;
+}
+.brand {
+  color: #0EBFE9;
+  float: left;
+  margin-left: 10px;
+  font-size: 1.7em;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  padding-top: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+.container-fluid{
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.nav-pills >li >a {
+    color: black;
+    font-size: 16px;
+ }
+ .nav-pills > li > a:hover {
+      background-color: #0EBFE9;
+ }
+/* .nav-pills .active > a {
+    background-color:#ccc;
+    color:#0088cc;
+} */
+td > a:hover{
+  text-decoration: none;
+  background-color: transparent;
+  color: #0EBFE9;
+}
+
+td > a{
+  font-size: 16px;
+}
+div #inputDescription > textarea{
+  height: 100px;
+}
+.message{
+  height: 25px;
+  padding-top: 5px;
+}
+#warning{
+  color: red;
+}
+#notice{
+  color: green;
+}
+#options{
+  color:blue;
+}
+/* bootstrap has a .table td class so need to override */
+.table tbody>tr>td.format {
+  vertical-align: middle;
+  font-size: 14px;
+}
+.padding{
+  height: 1px;
+}
+.set{
+  width: 15%;
+}
+.button{
+  width: 7%;
+}
+.blue{
+  color: #0EBFE9;
+}
+.btn-group{
+  background-color: transparent;
+}
+a#pretty{
+  color: #7e7e7e;
+}
+a#pretty:hover{
+  text-decoration: none;
+  background-color: transparent;
+  color:#0EBFE9;
+}
