@@ -6,6 +6,8 @@ import android.view.Menu;
 
 public class Authenticate extends Activity {
 
+	public static final String POST_LOGIN_URL = "https://myuh.hawaii.edu/cp/home/displaylogin";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

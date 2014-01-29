@@ -22,6 +22,7 @@ public class Initial extends Activity {
 		//use a default value if there is none
 		boolean firstUse = prefs.getBoolean(FIRST_USE, true);
 		
+		//check to see if this is the user's first time in the app
 		if (firstUse) {
 			authenticate.setText("I'm a first time user!");
 			Intent launchAuthenticate = new Intent(this,Authenticate.class);
@@ -33,9 +34,6 @@ public class Initial extends Activity {
 			startActivity(launchHome);
 			
 		}
-		//check to see if this the user's first time in the app
-/*		TextView authenticate = (TextView) findViewById(R.id.authenticate);
-		authenticate.setText("woof");*/
 	}
 
 	@Override
