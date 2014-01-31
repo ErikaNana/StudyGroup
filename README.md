@@ -2,8 +2,8 @@ StudyGroup
 ==========
 
 Ruby on Rails web app that communicates with an Android app <br>
-The Heroku application can be found <a href = "http://study-group-creator.herokuapp.com/">here</a>.
-
+The Heroku application can be found <a href = "http://study-group-creator.herokuapp.com/">here</a>. <br>
+<a href = "https://github.com/ErikaNana/StudyGroup/wiki/Important-Dates">Important Dates</a>
 First Milestone 
 ---------------
 * ~~Android app authenticates the user if they are using the app for the first time~~
