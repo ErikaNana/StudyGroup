@@ -1,43 +1,30 @@
 package edu.uhmanoa.studybuddies;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
 public class GetClasses extends Activity {
-	Map<String,String>cookieMap;
-	public static final String ROOT_URL = "http://myuh.hawaii.edu/cp/home/next";
-	public static final String REFERRER = "http://myuh.hawaii.edu/cps/welcome/loginok.html";
+	public static final String ROOT_URL = "https://www.sis.hawaii.edu/uhdad/avail.classes?i=MAN";
+	String START_URL = "https://www.sis.hawaii.edu/uhdad";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_get_classes);
-		
-		Intent thisIntent = this.getIntent();
-		cookieMap = new HashMap<String, String>();
-		//get the cookies for this session
-		//convert the bundle into a map so can use with jsoup
-		Bundle cookies = thisIntent.getBundleExtra(Authenticate.COOKIES);
-		Log.w("cookies", cookies.size()+"");
-		Set<String> keys = cookies.keySet();
-		for (String key: keys) {
-			cookieMap.put(key, cookies.getString(key));
-		}		
 		//go to the home page and get the name
 		getName names = new getName();
 		names.execute(new String [] {ROOT_URL});
@@ -49,26 +36,44 @@ public class GetClasses extends Activity {
 		@Override
 		protected String doInBackground(String... urls) {
 			Document getDoc = null;
-			String getResponse = "";
+			Document resDoc = null;
+			String urlToClasses = "";
+			String url = "";
+			String classesResponse = "";
 			try {
 				//get the page response first
-				Connection.Response get = Jsoup.connect(ROOT_URL)
-						.cookies(cookieMap)
+				Connection.Response get = Jsoup.connect(urls[0])
 						.method(Method.GET)
 						.execute();
 				
 				getDoc = get.parse();
-				getResponse = getDoc.toString();
+				Elements body = getDoc.getElementsByTag("A");
+				Element fullUrl = body.get(6);
 				
+				//get the link
+				Pattern p = Pattern.compile("\".*\"");
+				Matcher m = p.matcher(cleanURL(fullUrl.toString()));
+				if (m.find()) {
+					url = m.group(0);
+				}
+				String parsedURL = url.substring(2, url.length()-1);
+				urlToClasses = START_URL + parsedURL;
+				
+				//Connect to the page with all of the classes
+				Connection.Response res = Jsoup.connect(urlToClasses)
+						.method(Method.GET)
+						.execute();
+				resDoc = res.parse();
+				classesResponse = resDoc.toString();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return getResponse;
+			return classesResponse;
 		}
         @Override
         protected void onPostExecute(String response) {
-/*        	Log.w("response", response);*/
+        	Log.w("response", response);
 	        /*if (response != null) {          		
 	        	if (response.contains("Successful")) {
 	                    pd.dismiss();
@@ -90,5 +95,14 @@ public class GetClasses extends Activity {
 		getMenuInflater().inflate(R.menu.get_classes, menu);
 		return true;
 	}
+	
+	//returns the link of the current class
+	public String getCurrentSemesterLink(String response) {
+		return "";
+	}
 
+	//replaces escaped amps with actual amp
+	public String cleanURL(String url) {
+		return url.replace("amp;", "");
+	}
 }

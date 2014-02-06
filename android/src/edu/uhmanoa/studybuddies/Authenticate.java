@@ -1,10 +1,7 @@
 package edu.uhmanoa.studybuddies;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.Set;
 
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
@@ -48,30 +45,10 @@ public class Authenticate extends Activity implements OnClickListener {
 	//urls
 	public static final String POST_LOGIN_URL = "https://myuh.hawaii.edu/cp/home/login";
 	public static final String HOME_LOGIN = "https://myuh.hawaii.edu/cp/home/displaylogin";
-	public static final String OK_URL = "http://myuh.hawaii.edu/render.userLayoutRootNode.uP";
-	
-	//Request header stuff
-	public static final String REFERRER = "http://myuh.hawaii.edu/cps/welcome/loginok.html";
-	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:26.0) Gecko/20100101 Firefox/26.0";
-	public static final String ACCEPT_HEADER = "Accept";
-	public static final String ACCEPT_HEADER_VALUE = "	text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-	public static final String ACCEPT_ENCODING = "Accept-Encoding";
-	public static final String ACCEPT_ENCODING_HEADER_VALUE = "gzip, deflate";
-	public static final String ACCEPT_LANGUAGE_HEADER = "Accept-Language";
-	public static final String ACCEPT_LANGUAGE_HEADER_VALUE = "en-US,en;q=0.5";
-	public static final String CONNECTION_HEADER = "Connection";
-	public static final String CONNECTION_HEADER_VALUE = "keep-alive";
-	public static final String HOST_HEADER = "Host";
-	public static final String HOST_HEADER_VALUE = "myuh.hawaii.edu";
-	
+		
 	//error codes
 	public static final int WRONG_INPUT_ERROR = 1;
 	public static final int CONNECTION_ERROR = 2;
-	
-	Map<String, String> loginCookies = null;
-	
-	/**Values for data passed into the intent*/
-	public static final String COOKIES = "Cookies";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +111,6 @@ public class Authenticate extends Activity implements OnClickListener {
 
 					if (thing.contains("document.cplogin.uuid.value")) {
 						uuid = thing.substring(33, 69);
-						Log.w("uuid", uuid);
 						break;
 					}
 				}
@@ -148,33 +124,7 @@ public class Authenticate extends Activity implements OnClickListener {
 						.execute();
 
 				doc = res.parse();
-				loginCookies = res.cookies();
 				mLoginResponse = doc.toString();
-
-				//get the cookies
-/*				mCookieValue = res.cookie(COOKIE_TYPE);*/
-/*				Log.w("cookie", mCookieValue);*/
-				
-				//do more connecting?
-				Connection.Response follow = Jsoup.connect(urls[2])
-						.method(Method.GET)
-						.cookies(loginCookies)
-						.referrer(REFERRER)
-						.userAgent(USER_AGENT)
-						.header(ACCEPT_HEADER, ACCEPT_HEADER_VALUE)
-						.header(ACCEPT_ENCODING, ACCEPT_ENCODING_HEADER_VALUE)
-						.header(ACCEPT_LANGUAGE_HEADER,ACCEPT_LANGUAGE_HEADER_VALUE)
-						.header(CONNECTION_HEADER, CONNECTION_HEADER_VALUE)
-						.header(HOST_HEADER, HOST_HEADER_VALUE)
-						.followRedirects(true)
-						.ignoreHttpErrors(true)
-						.data("uP_root", "root")
-						.timeout(5000)
-						.execute();
-				
-				getDoc = follow.parse();
-				getResponse = getDoc.toString();
-				Log.w("response",getResponse);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -188,7 +138,6 @@ public class Authenticate extends Activity implements OnClickListener {
 	        	if (response.contains("Successful")) {
 	                    pd.dismiss();
 	                    Log.w("authenticate","YAY!!!");
-	                    
 	                    launchGetClasses();
 	        		}
 	        		else {
@@ -203,14 +152,6 @@ public class Authenticate extends Activity implements OnClickListener {
 	
 	public void launchGetClasses() {
         Intent launchGetClasses = new Intent(this,GetClasses.class);
-		Set<Entry<String, String>> entries = loginCookies.entrySet();
-		
-		//store the cookies
-		Bundle cookies = new Bundle();
-		for (Entry<String, String> entry : entries) {
-			cookies.putString(entry.getKey(), entry.getValue());
-		}
-		launchGetClasses.putExtra(COOKIES, cookies);
 		startActivity(launchGetClasses);
 	}
 	public void login() {
@@ -221,7 +162,7 @@ public class Authenticate extends Activity implements OnClickListener {
 		pd.setIndeterminate(true);
 		pd.show();
 		connectToWebsite connect = new connectToWebsite();
-		connect.execute(new String [] {HOME_LOGIN, POST_LOGIN_URL, OK_URL, mUserName, mPassword});
+		connect.execute(new String [] {HOME_LOGIN, POST_LOGIN_URL, mUserName, mPassword});
 	}
 	
 	public void showErrorDialog(int typeOfError) {
