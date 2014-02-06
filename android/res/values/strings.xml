@@ -8,9 +8,11 @@
     <string name="title_activity_home">Home</string>
     <string name="authenticate">Please enter your user name and password for myUH</string>
     <string name="home">This is the user\'s home</string>
-    <string name = "userNameText">Username:  </string>
-    <string name = "passwordText">Password:  </string>
+    <string name="userNameText">Username:  </string>
+    <string name="passwordText">Password:  </string>
     <string name="userNameHint">Username</string>
     <string name="passwordHint">Password</string>
     <string name="loginButtonText">Login</string>
+    <string name="title_activity_get_classes">GetClasses</string>
+
 </resources>
