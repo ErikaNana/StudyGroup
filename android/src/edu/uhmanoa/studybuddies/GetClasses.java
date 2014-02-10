@@ -27,7 +27,7 @@ public class GetClasses extends Activity {
 		setContentView(R.layout.activity_get_classes);
 		//go to the home page and get the name
 		getName names = new getName();
-		names.execute(new String [] {ROOT_URL});
+		names.execute(new String [] {START_URL});
 		
 	}
 	

@@ -3,7 +3,6 @@ package edu.uhmanoa.studybuddies;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.jsoup.Connection;
@@ -27,12 +26,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
-//first you need to get the page so you can get the uuid and post on the same instance
-
-//try using BANSSO and badprotocol cookies, probably not, since tamper data didn't affect it
-//try setting the headers --> uPortal-version header
-//nope never mind --> figure out what is the difference between a response header and a request header
-//try changing the user agent, logging in on wifi, it probably has to do with the headers
 public class Authenticate extends Activity implements OnClickListener {
 	
 	Button mLoginButton;
@@ -48,7 +41,9 @@ public class Authenticate extends Activity implements OnClickListener {
 	//urls
 	public static final String POST_LOGIN_URL = "https://myuh.hawaii.edu/cp/home/login";
 	public static final String HOME_LOGIN = "https://myuh.hawaii.edu/cp/home/displaylogin";
-	public static final String OK_URL = "http://myuh.hawaii.edu/render.userLayoutRootNode.uP";
+	public static final String LAULIMA_LOGIN = "https://laulima.hawaii.edu/portal/xlogin";
+	public static final String ROOT_URL = "http://myuh.hawaii.edu/render.userLayoutRootNode.uP?";
+	public static final String SCHED_URL = "https://www.sis.hawaii.edu/uhdad/bwskcrse.P_CrseSchdDetl";
 	
 	//Request header stuff
 	public static final String REFERRER = "http://myuh.hawaii.edu/cps/welcome/loginok.html";
@@ -69,7 +64,7 @@ public class Authenticate extends Activity implements OnClickListener {
 	public static final int CONNECTION_ERROR = 2;
 	
 	Map<String, String> loginCookies = null;
-	
+	Map<String, String> updatedCookies = null;
 	/**Values for data passed into the intent*/
 	public static final String COOKIES = "Cookies";
 	
@@ -111,52 +106,27 @@ public class Authenticate extends Activity implements OnClickListener {
 		@Override
 		protected String doInBackground(String... urls) {
 			Document doc = null;
-			Document getDoc = null;
-			String getResponse = "";
-			String uuid = "";
 			
 			try {
-				//get the page response first
-				Connection.Response get = Jsoup.connect(urls[0])
-						.method(Method.GET)
-						.execute();
-				
-				getDoc = get.parse();
-				getResponse = getDoc.toString();
-				
-				//get the uuid
-				//change this later to regex because this might be slow
-				Scanner scanner = new Scanner(getResponse);
-				
-				scanner.useDelimiter("\n");
-				while (scanner.hasNext()) {
-					String thing = scanner.next();
-
-					if (thing.contains("document.cplogin.uuid.value")) {
-						uuid = thing.substring(33, 69);
-						Log.w("uuid", uuid);
-						break;
-					}
-				}
-				scanner.close();
-
-				Connection.Response res = Jsoup.connect(urls[1])
-						.data("user", mUserName)
-						.data("pass", mPassword)
-						.data("uuid",uuid)
+				Connection.Response res = Jsoup.connect(urls[0])
+						.data("eid", mUserName)
+						.data("pw", mPassword)
+						.data("submit","Login")
 						.method(Method.POST)
 						.execute();
 
 				doc = res.parse();
 				loginCookies = res.cookies();
+				Log.w("loginCookies", loginCookies.toString());
 				mLoginResponse = doc.toString();
+				Log.w("response", doc.toString());
 
 				//get the cookies
 /*				mCookieValue = res.cookie(COOKIE_TYPE);*/
 /*				Log.w("cookie", mCookieValue);*/
 				
 				//do more connecting?
-				Connection.Response follow = Jsoup.connect(urls[2])
+/*				Connection.Response follow = Jsoup.connect(urls[2])
 						.method(Method.GET)
 						.cookies(loginCookies)
 						.referrer(REFERRER)
@@ -174,7 +144,17 @@ public class Authenticate extends Activity implements OnClickListener {
 				
 				getDoc = follow.parse();
 				getResponse = getDoc.toString();
-				Log.w("response",getResponse);
+				updatedCookies = follow.cookies();
+				Log.w("updated", updatedCookies.toString());
+				
+				Connection.Response terms = Jsoup.connect(SCHED_URL)
+						.method(Method.GET)
+						.cookies(loginCookies)
+						.cookie("TESTID", "SET")
+						.execute();
+				Document docTerms = terms.parse();
+				String termsResponse = docTerms.toString(); 
+				Log.w("response",termsResponse);*/
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -185,11 +165,11 @@ public class Authenticate extends Activity implements OnClickListener {
         @Override
         protected void onPostExecute(String response) {
 	        if (response != null) {          		
-	        	if (response.contains("Successful")) {
+	        	if (response.contains("My Workspace")) {
 	                    pd.dismiss();
 	                    Log.w("authenticate","YAY!!!");
 	                    
-	                    launchGetClasses();
+	                    //launchGetClasses();
 	        		}
 	        		else {
 	        			showErrorDialog(WRONG_INPUT_ERROR);
@@ -221,7 +201,7 @@ public class Authenticate extends Activity implements OnClickListener {
 		pd.setIndeterminate(true);
 		pd.show();
 		connectToWebsite connect = new connectToWebsite();
-		connect.execute(new String [] {HOME_LOGIN, POST_LOGIN_URL, OK_URL, mUserName, mPassword});
+		connect.execute(new String [] {LAULIMA_LOGIN, POST_LOGIN_URL, ROOT_URL, mUserName, mPassword});
 	}
 	
 	public void showErrorDialog(int typeOfError) {
