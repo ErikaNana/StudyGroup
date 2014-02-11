@@ -29,7 +29,7 @@ public class GetClasses extends Activity {
 	
 	//to connect to different urls
 	public static final int CONNECT_CURRENT_SEMESTER = 3;
-	public static final int CONNECT_CURRENT_DEPARTMENT = 4;
+	public static final int CONNECT_DEPARTMENT = 4;
 	
 	//get class availability
 	String BASE_URL = "https://www.sis.hawaii.edu/uhdad";
@@ -75,7 +75,7 @@ public class GetClasses extends Activity {
 			
 			try {				
 				//Connect to the page with all of the classes
-				Connection.Response res = Jsoup.connect(ROOT_URL)
+				Connection.Response res = Jsoup.connect(urls[0])
 						.method(Method.GET)
 						.execute();
 				resDoc = res.parse();
@@ -94,9 +94,14 @@ public class GetClasses extends Activity {
 				
 				String link = getCurrentSemesterLink(response);
 	        	link = BASE_URL + link;
-	        	Log.w("link", link);
+	        	
+	        	//connect to the pages with departments
+	        	Connect getSemester = new Connect(CONNECT_DEPARTMENT);
+	    		getSemester.execute(new String [] {link});
+	    		
 				break;
-			case CONNECT_CURRENT_DEPARTMENT:
+			case CONNECT_DEPARTMENT:
+				Log.w("response", response);
 				break;
 		}
         }
