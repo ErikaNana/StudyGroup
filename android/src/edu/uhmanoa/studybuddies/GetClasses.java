@@ -1,6 +1,8 @@
 package edu.uhmanoa.studybuddies;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +14,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,74 +22,83 @@ import android.view.Menu;
 
 public class GetClasses extends Activity {
 	public static final String ROOT_URL = "https://www.sis.hawaii.edu/uhdad/avail.classes?i=MAN";
-	String START_URL = "https://www.sis.hawaii.edu/uhdad";
+	public static final String COOKIE = "JSESSIONID";
+	public static final int CRN = 0;
+	public static final int URL = 1;
+	public static final int SEARCH_NAME = 2;
+	
+	//to connect to different urls
+	public static final int CONNECT_CURRENT_SEMESTER = 3;
+	public static final int CONNECT_CURRENT_DEPARTMENT = 4;
+	
+	//get class availability
+	String BASE_URL = "https://www.sis.hawaii.edu/uhdad";
+	
+	String mCookieValue = "";
+	String mLoginResponse = "";
+	HashMap<String,String[]>classInfo;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_get_classes);
-		//go to the home page and get the name
-		getName names = new getName();
-		names.execute(new String [] {START_URL});
+		classInfo = new HashMap<String,String[]>();
+		
+		Intent thisIntent = this.getIntent();
+		//get cookies 
+		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
+
+		//get class names
+		mLoginResponse = thisIntent.getStringExtra(Authenticate.LOGIN_RESPONSE);
+		getClassAndCRN(mLoginResponse);
+		
+		//just test
+		String[] testing = classInfo.get("ICS 414");
+		String searchName = testing[SEARCH_NAME];
+		
+		Connect getSemester = new Connect(CONNECT_CURRENT_SEMESTER);
+		getSemester.execute(new String [] {ROOT_URL});
 		
 	}
 	
-	private class getName extends AsyncTask <String, Void, String>{
-
+	private class Connect extends AsyncTask <String, Void, String>{
+		
+		int which = 0;
+		
+		public Connect(int which) {
+			this.which = which;
+		}
+		
 		@Override
 		protected String doInBackground(String... urls) {
-			Document getDoc = null;
 			Document resDoc = null;
-			String urlToClasses = "";
-			String url = "";
-			String classesResponse = "";
-			try {
-				//get the page response first
-				Connection.Response get = Jsoup.connect(urls[0])
-						.method(Method.GET)
-						.execute();
-				
-				getDoc = get.parse();
-				Elements body = getDoc.getElementsByTag("A");
-				Element fullUrl = body.get(6);
-				
-				//get the link
-				Pattern p = Pattern.compile("\".*\"");
-				Matcher m = p.matcher(cleanURL(fullUrl.toString()));
-				if (m.find()) {
-					url = m.group(0);
-				}
-				String parsedURL = url.substring(2, url.length()-1);
-				urlToClasses = START_URL + parsedURL;
-				
+			String semesterResponse = "";
+			
+			try {				
 				//Connect to the page with all of the classes
-				Connection.Response res = Jsoup.connect(urlToClasses)
+				Connection.Response res = Jsoup.connect(ROOT_URL)
 						.method(Method.GET)
 						.execute();
 				resDoc = res.parse();
-				classesResponse = resDoc.toString();
+				semesterResponse = resDoc.toString();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return classesResponse;
+			
+			return semesterResponse;
 		}
         @Override
         protected void onPostExecute(String response) {
-        	Log.w("response", response);
-	        /*if (response != null) {          		
-	        	if (response.contains("Successful")) {
-	                    pd.dismiss();
-	                    Log.w("authenticate","YAY!!!");
-	                    launchGetClasses();
-	        		}
-	        		else {
-	        			showErrorDialog(WRONG_INPUT_ERROR);
-	        		}
-	        }
-	        else {
-	        	showErrorDialog(CONNECTION_ERROR);
-	        }*/
+			switch(which) {
+			case CONNECT_CURRENT_SEMESTER:
+				
+				String link = getCurrentSemesterLink(response);
+	        	link = BASE_URL + link;
+	        	Log.w("link", link);
+				break;
+			case CONNECT_CURRENT_DEPARTMENT:
+				break;
+		}
         }
     }
 	@Override
@@ -96,13 +108,61 @@ public class GetClasses extends Activity {
 		return true;
 	}
 	
-	//returns the link of the current class
 	public String getCurrentSemesterLink(String response) {
-		return "";
+		Document doc = Jsoup.parse(response);
+		Elements links = doc.getElementsByTag("a");
+		Element link = links.get(6);
+		String url = link.attr("HREF");
+		
+		//remove the dot
+		url = url.replaceFirst(".", "");
+		return url;
 	}
-
-	//replaces escaped amps with actual amp
-	public String cleanURL(String url) {
-		return url.replace("amp;", "");
+	//get the classAndCRN
+	public void getClassAndCRN(String response) {
+		Document doc = Jsoup.parse(response);
+		Elements links = doc.getElementsByTag("a");
+		
+		for (Element link : links) {
+			String url = link.attr("abs:href");
+			if (url.isEmpty() || url.contains("logout")) {
+				continue;
+			}
+			String text = link.attr("title");
+			
+			Pattern classNamePattern = Pattern.compile("[A-Z]+-[0-9]+");
+			Pattern crnPattern = Pattern.compile("\\.[0-9]+");
+			Pattern searchClassPattern = Pattern.compile("[A-Z]+");
+			
+			String className = "";
+			String crnMatch = "";
+			String searchName = "";
+			
+			Matcher matcher = classNamePattern.matcher(text);
+			if (matcher.find()) {
+				className = matcher.group(0);
+				matcher = crnPattern.matcher(text);
+				
+				if (matcher.find()) {
+					crnMatch = matcher.group(0);
+					
+					//strip . from crn
+					crnMatch = crnMatch.replace(".", "");
+					
+					//strip - from class name
+					className = className.replace("-", " "); 
+					
+					//get the class prefix to search
+					matcher = searchClassPattern.matcher(className);
+					if (matcher.find()) {
+						searchName = matcher.group(0);
+					}
+				}					
+				String [] data = {crnMatch, url, searchName};
+				classInfo.put(className, data);
+			}
+		}
+		
+		Log.w("Classinfo", classInfo.toString());
 	}
 }
