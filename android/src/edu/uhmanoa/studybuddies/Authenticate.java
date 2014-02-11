@@ -117,7 +117,7 @@ public class Authenticate extends Activity implements OnClickListener {
 	        if (response != null) {          		
 	        	if (response.contains("My Workspace")) {
 	                    pd.dismiss();
-	                    Log.w("authenticate","YAY!!!");
+/*	                    Log.w("authenticate","YAY!!!");*/
 	                    launchGetClasses();
 	        		}
 	        		else {

@@ -1,8 +1,9 @@
 package edu.uhmanoa.studybuddies;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,7 @@ public class GetClasses extends Activity {
 	//to connect to different urls
 	public static final int CONNECT_CURRENT_SEMESTER = 3;
 	public static final int CONNECT_DEPARTMENT = 4;
+	public static final int GET_TIME_FROM_DEPARTMENT = 5;
 	
 	//get class availability
 	String BASE_URL = "https://www.sis.hawaii.edu/uhdad";
@@ -37,11 +39,15 @@ public class GetClasses extends Activity {
 	String mCookieValue = "";
 	String mLoginResponse = "";
 	HashMap<String,String[]>classInfo;
+	HashMap<String, String> classUrls;
+	ArrayList<String> classDepts;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		classInfo = new HashMap<String,String[]>();
+		classUrls = new HashMap<String, String>();
+		classDepts = new ArrayList<String>();
 		
 		Intent thisIntent = this.getIntent();
 		//get cookies 
@@ -50,10 +56,6 @@ public class GetClasses extends Activity {
 		//get class names
 		mLoginResponse = thisIntent.getStringExtra(Authenticate.LOGIN_RESPONSE);
 		getClassAndCRN(mLoginResponse);
-		
-		//just test
-		String[] testing = classInfo.get("ICS 414");
-		String searchName = testing[SEARCH_NAME];
 		
 		Connect getSemester = new Connect(CONNECT_CURRENT_SEMESTER);
 		getSemester.execute(new String [] {ROOT_URL});
@@ -90,20 +92,21 @@ public class GetClasses extends Activity {
         @Override
         protected void onPostExecute(String response) {
 			switch(which) {
-			case CONNECT_CURRENT_SEMESTER:
-				
-				String link = getCurrentSemesterLink(response);
-	        	link = BASE_URL + link;
-	        	
-	        	//connect to the pages with departments
-	        	Connect getSemester = new Connect(CONNECT_DEPARTMENT);
-	    		getSemester.execute(new String [] {link});
-	    		
-				break;
-			case CONNECT_DEPARTMENT:
-				Log.w("response", response);
-				break;
-		}
+				case CONNECT_CURRENT_SEMESTER:
+					
+					String link = getCurrentSemesterLink(response);
+		        	link = BASE_URL + link;
+		        	
+		        	//connect to the pages with departments
+		        	Connect getSemester = new Connect(CONNECT_DEPARTMENT);
+		    		getSemester.execute(new String [] {link});
+		    		
+					break;
+				case CONNECT_DEPARTMENT:
+/*					Log.w("response", response);*/
+					getDepartmentLinks(response,classDepts);
+					break;
+			}
         }
     }
 	@Override
@@ -111,6 +114,35 @@ public class GetClasses extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.get_classes, menu);
 		return true;
+	}
+	
+	//get the links, go to them, and parse results to get the time
+	public void getDepartmentLinks(String response, ArrayList<String> depts) {		
+		Document doc = Jsoup.parse(response);
+		Elements links = doc.getElementsByTag("a");
+		
+		for (Element link: links) {
+			String url = link.attr("href");
+			if (url.contains("&") && !(url.contains("frames"))) {
+				//check if that link should
+				Set<String> keys = classInfo.keySet();
+				
+				for (String key : keys) {
+					String[] data = classInfo.get(key);
+					String dept = data[SEARCH_NAME];
+					if (url.contains("=" + dept)) {
+						Log.w("url",url);
+					}
+				}
+			}
+		}
+		
+/*		Log.w("classDepts", classDepts.size() + "");*/
+	}
+	
+	public String getTime(String response) {
+		String time = "";
+		return time;
 	}
 	
 	public String getCurrentSemesterLink(String response) {
@@ -126,27 +158,26 @@ public class GetClasses extends Activity {
 	//get the classAndCRN
 	public void getClassAndCRN(String response) {
 		Document doc = Jsoup.parse(response);
-		Elements links = doc.getElementsByTag("a");
-		
-		for (Element link : links) {
+		Elements list = doc.select("ul#siteLinkList");
+		Elements links = list.select("a");
+		for (Element link: links) {
 			String url = link.attr("abs:href");
-			if (url.isEmpty() || url.contains("logout")) {
+			if (url.contains("#")) {
 				continue;
 			}
 			String text = link.attr("title");
 			
 			Pattern classNamePattern = Pattern.compile("[A-Z]+-[0-9]+");
-			Pattern crnPattern = Pattern.compile("\\.[0-9]+");
+			Pattern crn = Pattern.compile("\\.[0-9]+");
 			Pattern searchClassPattern = Pattern.compile("[A-Z]+");
 			
 			String className = "";
 			String crnMatch = "";
-			String searchName = "";
 			
 			Matcher matcher = classNamePattern.matcher(text);
 			if (matcher.find()) {
 				className = matcher.group(0);
-				matcher = crnPattern.matcher(text);
+				matcher = crn.matcher(text);
 				
 				if (matcher.find()) {
 					crnMatch = matcher.group(0);
@@ -157,17 +188,16 @@ public class GetClasses extends Activity {
 					//strip - from class name
 					className = className.replace("-", " "); 
 					
-					//get the class prefix to search
 					matcher = searchClassPattern.matcher(className);
 					if (matcher.find()) {
-						searchName = matcher.group(0);
-					}
-				}					
-				String [] data = {crnMatch, url, searchName};
-				classInfo.put(className, data);
+						String searchName = matcher.group(0);
+/*						Log.w("Search","Search name:  " + searchName);*/
+						
+						String [] data = {crnMatch,url,searchName};
+						classInfo.put(className, data);
+					}	
+				}
 			}
 		}
-		
-		Log.w("Classinfo", classInfo.toString());
 	}
 }
