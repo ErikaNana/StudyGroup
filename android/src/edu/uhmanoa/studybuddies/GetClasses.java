@@ -18,7 +18,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 
 public class GetClasses extends Activity {
@@ -45,8 +44,6 @@ public class GetClasses extends Activity {
 	//key searchName, value = url to search
 	HashMap<String, String> classUrls;
 	
-	ArrayList<String> classDepts;
-	
 	//key = searchName, value = crn's to search
 	HashMap<String, ArrayList<String>> crnAndDeptInfo;
 	
@@ -55,7 +52,6 @@ public class GetClasses extends Activity {
 		super.onCreate(savedInstanceState);
 		classInfo = new HashMap<String,String[]>();
 		classUrls = new HashMap<String, String>();
-		classDepts = new ArrayList<String>();
 		crnAndDeptInfo = new HashMap<String, ArrayList<String>>();
 		Intent thisIntent = this.getIntent();
 		//get cookies 
@@ -112,7 +108,7 @@ public class GetClasses extends Activity {
 					break;
 				case CONNECT_DEPARTMENT:
 /*					Log.w("response", response);*/
-					getDepartmentLinks(response,classDepts);
+					getDepartmentLinks(response);
 					break;
 			}
         }
@@ -125,7 +121,7 @@ public class GetClasses extends Activity {
 	}
 	
 	//get the links, go to them, and parse results to get the time
-	public void getDepartmentLinks(String response, ArrayList<String> depts) {		
+	public void getDepartmentLinks(String response) {		
 		Document doc = Jsoup.parse(response);
 		Elements links = doc.getElementsByTag("a");
 		
@@ -150,17 +146,22 @@ public class GetClasses extends Activity {
 							crn.add(data[CRN]);
 						}
 						crnAndDeptInfo.put(dept, crn);
+						
+						//get the urls to go to
+						if (!classUrls.containsKey(key)) {
+							classUrls.put(dept, url);
+						}
 /*						Log.w("url",url);*/
 					}
 				}
 			}
 		}
 		
-		Set<String> checkKeys = crnAndDeptInfo.keySet();
+/*		Set<String> checkKeys = classUrls.keySet();
 		for (String key: checkKeys) {
 			Log.w("key","key:  " + key);
-			Log.w("value","value:  " + crnAndDeptInfo.get(key));
-		}
+			Log.w("value","value:  " + classUrls.get(key));
+		}*/
 /*		Log.w("classDepts", classDepts.size() + "");*/
 	}
 	
