@@ -38,9 +38,17 @@ public class GetClasses extends Activity {
 	
 	String mCookieValue = "";
 	String mLoginResponse = "";
+	
+	//key = className, value = data (crn, url, searchName)
 	HashMap<String,String[]>classInfo;
+	
+	//key searchName, value = url to search
 	HashMap<String, String> classUrls;
+	
 	ArrayList<String> classDepts;
+	
+	//key = searchName, value = crn's to search
+	HashMap<String, ArrayList<String>> crnAndDeptInfo;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +56,7 @@ public class GetClasses extends Activity {
 		classInfo = new HashMap<String,String[]>();
 		classUrls = new HashMap<String, String>();
 		classDepts = new ArrayList<String>();
-		
+		crnAndDeptInfo = new HashMap<String, ArrayList<String>>();
 		Intent thisIntent = this.getIntent();
 		//get cookies 
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
@@ -131,12 +139,28 @@ public class GetClasses extends Activity {
 					String[] data = classInfo.get(key);
 					String dept = data[SEARCH_NAME];
 					if (url.contains("=" + dept)) {
-						Log.w("url",url);
+						//add to hashmap
+						ArrayList<String> crn = new ArrayList<String>();
+						//check if key already exists
+						if (crnAndDeptInfo.containsKey(dept)) {
+							crn = crnAndDeptInfo.get(dept);
+							crn.add(data[CRN]);
+						}
+						else {
+							crn.add(data[CRN]);
+						}
+						crnAndDeptInfo.put(dept, crn);
+/*						Log.w("url",url);*/
 					}
 				}
 			}
 		}
 		
+		Set<String> checkKeys = crnAndDeptInfo.keySet();
+		for (String key: checkKeys) {
+			Log.w("key","key:  " + key);
+			Log.w("value","value:  " + crnAndDeptInfo.get(key));
+		}
 /*		Log.w("classDepts", classDepts.size() + "");*/
 	}
 	
