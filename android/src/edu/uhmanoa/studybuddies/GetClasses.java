@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
 public class GetClasses extends Activity {
@@ -29,7 +30,7 @@ public class GetClasses extends Activity {
 	
 	//to connect to different urls
 	public static final int CONNECT_CURRENT_SEMESTER = 3;
-	public static final int CONNECT_DEPARTMENT = 4;
+	public static final int CONNECT_DEPARTMENTS = 4;
 	public static final int GET_TIME_FROM_DEPARTMENT = 5;
 	
 	//get class availability
@@ -102,13 +103,24 @@ public class GetClasses extends Activity {
 		        	link = BASE_URL + link;
 		        	
 		        	//connect to the pages with departments
-		        	Connect getSemester = new Connect(CONNECT_DEPARTMENT);
+		        	Connect getSemester = new Connect(CONNECT_DEPARTMENTS);
 		    		getSemester.execute(new String [] {link});
 		    		
 					break;
-				case CONNECT_DEPARTMENT:
+				case CONNECT_DEPARTMENTS:
 /*					Log.w("response", response);*/
 					getDepartmentLinks(response);
+					
+					//go to individual department pages and get time
+					Set<String> classes = classUrls.keySet();
+					for (String className:  classes) {
+						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
+						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});
+					}
+					break;
+				case GET_TIME_FROM_DEPARTMENT:
+					getDayAndTime(response);
+/*					Log.w("response", response);*/
 					break;
 			}
         }
@@ -120,6 +132,13 @@ public class GetClasses extends Activity {
 		return true;
 	}
 	
+	//maybe this should return a hashmap of crn to time
+	public String getDayAndTime(String response) {
+		//use the searchName and the CRNS to find the times
+		//h1 tag has the searchName
+		String time = "";
+		return time;
+	}
 	//get the links, go to them, and parse results to get the time
 	public void getDepartmentLinks(String response) {		
 		Document doc = Jsoup.parse(response);
@@ -128,9 +147,13 @@ public class GetClasses extends Activity {
 		for (Element link: links) {
 			String url = link.attr("href");
 			if (url.contains("&") && !(url.contains("frames"))) {
-				//check if that link should
+				
+				//remove the first dot
+				url = url.replaceFirst(".", "");
+				
 				Set<String> keys = classInfo.keySet();
 				
+				//get urls for depts, and map crns to depts
 				for (String key : keys) {
 					String[] data = classInfo.get(key);
 					String dept = data[SEARCH_NAME];
@@ -147,7 +170,7 @@ public class GetClasses extends Activity {
 						}
 						crnAndDeptInfo.put(dept, crn);
 						
-						//get the urls to go to
+						//get the urls to search
 						if (!classUrls.containsKey(key)) {
 							classUrls.put(dept, url);
 						}
@@ -165,11 +188,6 @@ public class GetClasses extends Activity {
 /*		Log.w("classDepts", classDepts.size() + "");*/
 	}
 	
-	public String getTime(String response) {
-		String time = "";
-		return time;
-	}
-	
 	public String getCurrentSemesterLink(String response) {
 		Document doc = Jsoup.parse(response);
 		Elements links = doc.getElementsByTag("a");
@@ -183,16 +201,19 @@ public class GetClasses extends Activity {
 	//get the classAndCRN
 	public void getClassAndCRN(String response) {
 		Document doc = Jsoup.parse(response);
-		Elements list = doc.select("ul#siteLinkList");
-		Elements links = list.select("a");
-		for (Element link: links) {
+		Elements rows = doc.select("div.termContainer");
+		System.out.println("rows size:  " + rows.size());
+		//always get the the most current one
+		Element currentClasses = rows.get(rows.size()-1);
+		Elements classLinks = currentClasses.select("a");
+		for (Element link: classLinks) {
 			String url = link.attr("abs:href");
 			if (url.contains("#")) {
 				continue;
 			}
 			String text = link.attr("title");
 			
-			Pattern classNamePattern = Pattern.compile("[A-Z]+-[0-9]+");
+			Pattern classNamePattern = Pattern.compile("[MAN ]*[A-Z]+-[0-9]+");
 			Pattern crn = Pattern.compile("\\.[0-9]+");
 			Pattern searchClassPattern = Pattern.compile("[A-Z]+");
 			
@@ -202,6 +223,8 @@ public class GetClasses extends Activity {
 			Matcher matcher = classNamePattern.matcher(text);
 			if (matcher.find()) {
 				className = matcher.group(0);
+				Log.w("Class Name"," name:  " + className);
+				Log.w("title", text);
 				matcher = crn.matcher(text);
 				
 				if (matcher.find()) {
@@ -216,13 +239,24 @@ public class GetClasses extends Activity {
 					matcher = searchClassPattern.matcher(className);
 					if (matcher.find()) {
 						String searchName = matcher.group(0);
-/*						Log.w("Search","Search name:  " + searchName);*/
-						
 						String [] data = {crnMatch,url,searchName};
 						classInfo.put(className, data);
 					}	
 				}
+				else { //no CRN, might be online class
+					if (className.contains("MAN ")) {
+						className.replace("MAN ", "");
+						matcher = searchClassPattern.matcher(className);
+						if (matcher.find()) {
+							String searchName = matcher.group(0);
+							String [] data = {"None", url, searchName};
+							classInfo.put(className, data);
+						}
+					}
+				}
 			}
 		}
+		Log.w("classInfo", classInfo.toString());
+		Log.w("classInfo", "classInfo size:  " + classInfo.size());
 	}
 }
