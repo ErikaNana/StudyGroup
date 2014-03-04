@@ -121,11 +121,12 @@ public class GetClasses extends Activity {
 					
 					//go to individual department pages and get time
 					Set<String> classes = classUrls.keySet();
+					Log.w("length of classes", classes.size() + "");
 					for (String className:  classes) {
-						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
+/*						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);*/
 						Log.w("className", className);
-						currentDept = className;
-						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});
+/*						currentDept = className;
+						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});*/
 					}
 					break;
 				case GET_TIME_FROM_DEPARTMENT:
@@ -219,6 +220,7 @@ public class GetClasses extends Activity {
 	}
 	//gets crnAndDeptInfo and classUrls
 	public void getDepartmentLinks(String response) {		
+		Log.w("response", response);
 		Document doc = Jsoup.parse(response);
 		Elements links = doc.getElementsByTag("a");
 		
@@ -228,15 +230,20 @@ public class GetClasses extends Activity {
 				
 				//remove the first dot
 				url = url.replaceFirst(".", "");
-				
+/*				Log.w("url", url);*/
 				Set<String> keys = classInfo.keySet();
-				
+
 				//get urls for depts, and map crns to depts
 				for (String key : keys) {
+/*					Log.w("keys in deptlinks", key);*/
 					String[] data = classInfo.get(key);
 					String dept = data[SEARCH_NAME];
+/*					Log.w("dept", dept);*/
 					if (url.contains("=" + dept)) {
 						//add to hashmap
+						if (dept.equals("EE")) {
+							Log.w("Here","IT'S HERE");
+						}
 						ArrayList<String> crn = new ArrayList<String>();
 						//check if key already exists
 						if (crnAndDeptInfo.containsKey(dept)) {
@@ -289,6 +296,11 @@ public class GetClasses extends Activity {
 		Document doc = Jsoup.parse(response);
 		Elements links = doc.getElementsByTag("a");
 		Element link = links.get(6);
+		
+		//check if it is summer
+		if (link.text().contains("Summer")) {
+			link = links.get(7);
+		}
 		String url = link.attr("HREF");
 		
 		//remove the dot
