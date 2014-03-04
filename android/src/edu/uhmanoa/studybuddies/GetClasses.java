@@ -49,9 +49,6 @@ public class GetClasses extends Activity {
 	//key searchName, value = url to search
 	HashMap<String, String> classUrls;
 	
-	//key = searchName, value = crn's to search
-	HashMap<String, ArrayList<String>> crnAndDeptInfo;
-	
 	//key = courseName, course object
 	HashMap<String, Course> courses;
 	
@@ -66,7 +63,6 @@ public class GetClasses extends Activity {
 		super.onCreate(savedInstanceState);
 		classInfo = new HashMap<String,String[]>();
 		classUrls = new HashMap<String, String>();
-		crnAndDeptInfo = new HashMap<String, ArrayList<String>>();
 		courses = new HashMap<String,Course>();
 		crns = new ArrayList<String>();
 		Intent thisIntent = this.getIntent();
@@ -242,14 +238,6 @@ public class GetClasses extends Activity {
 				course.addCRN(crn);
 				courses.put(className,course);
 			}
-			
-/*			if (crns.contains(crn)) {
-				//update the crn
-				course = new Course(className);
-				course = addToClass(columnsArray,course);
-				course.addCRN(crn);
-				courses.put(className,course);
-			}*/
 		}
 /*		for (String key: courses.keySet()) {
 			Log.w("course key", key);
@@ -270,32 +258,17 @@ public class GetClasses extends Activity {
 				
 				//remove the first dot
 				url = url.replaceFirst(".", "");
-/*				Log.w("url", url);*/
 				Set<String> keys = classInfo.keySet();
 
 				//get urls for depts, and map crns to depts
 				for (String key : keys) {
-/*					Log.w("keys in deptlinks", key);*/
 					String[] data = classInfo.get(key);
 					String dept = data[SEARCH_NAME];
-/*					Log.w("dept", dept);*/
 					if (url.contains("=" + dept)) {
-						//add to hashmap
-						ArrayList<String> crn = new ArrayList<String>();
-						//check if key already exists
-						if (crnAndDeptInfo.containsKey(dept)) {
-							crn = crnAndDeptInfo.get(dept);
-							crn.add(data[CRN]);
-						}
-						else {
-							crn.add(data[CRN]);
-						}
-						crnAndDeptInfo.put(dept, crn);	
 						//get the urls to search
 						if (!classUrls.containsKey(key)) {
 							classUrls.put(dept, url);
 						}
-/*						Log.w("url",url);*/
 					}
 				}
 			}
