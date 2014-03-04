@@ -40,6 +40,7 @@ public class GetClasses extends Activity {
 	String mLoginResponse = "";
 	
 	//key = className, value = data (crn, url, searchName)
+	//key = EE 496, value = [80823,url,EE]
 	HashMap<String,String[]>classInfo;
 	
 	//key searchName, value = url to search
@@ -48,17 +49,24 @@ public class GetClasses extends Activity {
 	//key = searchName, value = crn's to search
 	HashMap<String, ArrayList<String>> crnAndDeptInfo;
 	
+	HashMap<String, Course> courses;
+	
+	//the department that we're currently getting CRNs from
+	String currentDept;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		classInfo = new HashMap<String,String[]>();
 		classUrls = new HashMap<String, String>();
 		crnAndDeptInfo = new HashMap<String, ArrayList<String>>();
+		courses = new HashMap<String,Course>();
+	
 		Intent thisIntent = this.getIntent();
 		//get cookies 
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
 
-		//get class names
+		//get classInfo
 		mLoginResponse = thisIntent.getStringExtra(Authenticate.LOGIN_RESPONSE);
 		getClassAndCRN(mLoginResponse);
 		
@@ -78,7 +86,7 @@ public class GetClasses extends Activity {
 		@Override
 		protected String doInBackground(String... urls) {
 			Document resDoc = null;
-			String semesterResponse = "";
+			String response = "";
 			
 			try {				
 				//Connect to the page with all of the classes
@@ -86,13 +94,13 @@ public class GetClasses extends Activity {
 						.method(Method.GET)
 						.execute();
 				resDoc = res.parse();
-				semesterResponse = resDoc.toString();
+				response = resDoc.toString();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			return semesterResponse;
+			return response;
 		}
         @Override
         protected void onPostExecute(String response) {
@@ -115,6 +123,8 @@ public class GetClasses extends Activity {
 					Set<String> classes = classUrls.keySet();
 					for (String className:  classes) {
 						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
+						Log.w("className", className);
+						currentDept = className;
 						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});
 					}
 					break;
@@ -133,13 +143,81 @@ public class GetClasses extends Activity {
 	}
 	
 	//maybe this should return a hashmap of crn to time
-	public String getDayAndTime(String response) {
+	public void getDayAndTime(String response) {
+		ArrayList<String> crns = crnAndDeptInfo.get(currentDept);
+/*		Log.w("current dept", currentDept);
+		
+		for (String crn: crns) {
+			Log.w("crn", crn);
+		}*/
 		//use the searchName and the CRNS to find the times
 		//h1 tag has the searchName
-		String time = "";
-		return time;
+		//seperate between even and odd and then iterate
+		
+		Document doc = Jsoup.parse(response);
+		Elements rows = doc.select("tr");
+		ArrayList<Element> rowsArray = convertToArray(rows);
+		
+		//trim the fat off the arrays
+		rowsArray.remove(0);
+		int lengthOfRows = rowsArray.size();
+		System.out.println(lengthOfRows);
+		for (int i = lengthOfRows - 17; i < lengthOfRows; i++) {
+			rowsArray.remove(rowsArray.size()-1); //always remove the last element
+		}
+		Course course = null;
+		HashMap<String,Course> courses = new HashMap<String,Course>();
+
+		for (Element row: rowsArray) {
+			Elements columns = row.select("td");
+			
+			//convert the columns to array for easier trimming
+			ArrayList<Element> columnsArray = convertToArray(columns);
+			int size = columnsArray.size();
+			System.out.println("size of columns:  " + size);
+			if (size == 30) { //for some reason this is needed
+				break;
+			}
+			System.out.println("-----------------");
+			System.out.println("another check:  " + size);
+			Element firstElement = columnsArray.get(0);
+			Element secondElement = columnsArray.get(1);
+			String firstElementText = firstElement.text();
+			String secondElementText = secondElement.text();
+			
+			//find crns in the first column or the second column
+			Pattern p = Pattern.compile("[0-9]{5}");
+			Matcher crnMatcherFirst = p.matcher(firstElementText);
+			Matcher crnMatcherSecond = p.matcher(secondElementText);
+			String crn = "";
+			
+			if (crnMatcherFirst.find()) {
+				crn = crnMatcherFirst.group(0);
+			}
+			else if (crnMatcherSecond.find()) {
+				crn = crnMatcherSecond.group(0);
+			}
+			
+			if (!crn.equals("")) {
+				System.out.println("crn:  " + crn);
+				//start of a new class
+				course = new Course(crn);
+			}
+			course = addToClass(columnsArray,course);
+			if (crns.contains(crn)) {
+				courses.put(crn,course);
+			}
+
+			System.out.println("---------");
+		}
+/*		Log.w("here", "i'm here");*/
+/*		Log.w("course keys", courses.keySet().size() + "");*/
+/*		for (String key: courses.keySet()) {
+			Log.w("course key", key);
+			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
+		}*/
 	}
-	//get the links, go to them, and parse results to get the time
+	//gets crnAndDeptInfo and classUrls
 	public void getDepartmentLinks(String response) {		
 		Document doc = Jsoup.parse(response);
 		Elements links = doc.getElementsByTag("a");
@@ -180,12 +258,31 @@ public class GetClasses extends Activity {
 			}
 		}
 		
-/*		Set<String> checkKeys = classUrls.keySet();
+		Set<String> checkKeys = classUrls.keySet();
 		for (String key: checkKeys) {
-			Log.w("key","key:  " + key);
-			Log.w("value","value:  " + classUrls.get(key));
-		}*/
+			Log.w("key url","key:  " + key);
+			Log.w("value url","value:  " + classUrls.get(key));
+		}
 /*		Log.w("classDepts", classDepts.size() + "");*/
+	}
+	public static ArrayList<Element> convertToArray(Elements elements) {
+		ArrayList<Element> elementsArray = new ArrayList<Element>();
+		for (Element element: elements) {
+			//get rid of nbsp
+			if (!element.text().equals("\u00a0")) {
+				elementsArray.add(element);
+			}
+		}
+		return elementsArray;
+	}
+	
+	public static Course addToClass(ArrayList<Element> array, Course course) {
+		int arrayLength = array.size();
+		String classTime = array.get(arrayLength - 3).text();
+		String days = array.get(arrayLength - 4).text();
+		course.addDay(days);
+		course.addTime(classTime);
+		return course;
 	}
 	
 	public String getCurrentSemesterLink(String response) {
@@ -223,8 +320,8 @@ public class GetClasses extends Activity {
 			Matcher matcher = classNamePattern.matcher(text);
 			if (matcher.find()) {
 				className = matcher.group(0);
-				Log.w("Class Name"," name:  " + className);
-				Log.w("title", text);
+/*				Log.w("Class Name"," name:  " + className);
+				Log.w("title", text);*/
 				matcher = crn.matcher(text);
 				
 				if (matcher.find()) {
@@ -245,7 +342,7 @@ public class GetClasses extends Activity {
 				}
 				else { //no CRN, might be online class
 					if (className.contains("MAN ")) {
-						className.replace("MAN ", "");
+						className = className.replace("MAN ", "");
 						matcher = searchClassPattern.matcher(className);
 						if (matcher.find()) {
 							String searchName = matcher.group(0);
@@ -256,7 +353,14 @@ public class GetClasses extends Activity {
 				}
 			}
 		}
-		Log.w("classInfo", classInfo.toString());
+		/*Log.w("classInfo", classInfo.toString());*/
+/*		for (String key: classInfo.keySet()) {
+			Log.w("classInfo", "key:  " + key);
+			String[] elements = classInfo.get(key);
+			for (String element: elements) {
+				Log.w("classInfo", element);
+			}
+		}*/
 		Log.w("classInfo", "classInfo size:  " + classInfo.size());
 	}
 }
