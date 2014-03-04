@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
+//NEED TO FIX COMG 251 MWF bug, right now only giving M
+
 public class GetClasses extends Activity {
 	public static final String ROOT_URL = "https://www.sis.hawaii.edu/uhdad/avail.classes?i=MAN";
 	public static final String COOKIE = "JSESSIONID";
@@ -41,6 +43,7 @@ public class GetClasses extends Activity {
 	
 	//key = className, value = data (crn, url, searchName)
 	//key = EE 496, value = [80823,url,EE]
+	//maybe should make the key the crn, and name where the crn is
 	HashMap<String,String[]>classInfo;
 	
 	//key searchName, value = url to search
@@ -49,10 +52,14 @@ public class GetClasses extends Activity {
 	//key = searchName, value = crn's to search
 	HashMap<String, ArrayList<String>> crnAndDeptInfo;
 	
+	//key = courseName, course object
 	HashMap<String, Course> courses;
 	
-	//the department that we're currently getting CRNs from
-	String currentDept;
+	//arraylist of crns
+	ArrayList<String> crns;
+	
+	//keep track if done hitting dept urls
+	int counter = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +68,7 @@ public class GetClasses extends Activity {
 		classUrls = new HashMap<String, String>();
 		crnAndDeptInfo = new HashMap<String, ArrayList<String>>();
 		courses = new HashMap<String,Course>();
-	
+		crns = new ArrayList<String>();
 		Intent thisIntent = this.getIntent();
 		//get cookies 
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
@@ -121,21 +128,43 @@ public class GetClasses extends Activity {
 					
 					//go to individual department pages and get time
 					Set<String> classes = classUrls.keySet();
-					Log.w("length of classes", classes.size() + "");
-					for (String className:  classes) {
-/*						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);*/
-						Log.w("className", className);
-/*						currentDept = className;
-						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});*/
+/*					Log.w("length of classes", classes.size() + "");*/
+					
+					//initialize classes, if there are times then they will be overidden
+					Log.w("crn length", crns.size() + "");
+					for (String courseName: classInfo.keySet()) {
+						Course course = new Course(courseName);
+						courses.put(courseName, course);
 					}
+				
+					for (String className:  classes) {
+						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
+/*						Log.w("className", className);*/
+						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});
+					}
+					Log.w("donezo", "donezo");
 					break;
 				case GET_TIME_FROM_DEPARTMENT:
 					getDayAndTime(response);
+					counter++;
+					Log.w("counter","counter:  " + counter);
+					if (counter == classUrls.keySet().size()) {
+						Log.w("donezo", "we're finished");
+						hitAgain();
+						counter = 0;
+					}
 /*					Log.w("response", response);*/
 					break;
 			}
         }
     }
+	public void hitAgain() {
+		Log.w("blah", "blah");
+		for (String key: courses.keySet()) {
+			Log.w("course key", key);
+			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
+		}
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -145,9 +174,9 @@ public class GetClasses extends Activity {
 	
 	//maybe this should return a hashmap of crn to time
 	public void getDayAndTime(String response) {
-		ArrayList<String> crns = crnAndDeptInfo.get(currentDept);
-/*		Log.w("current dept", currentDept);
-		
+		Log.w("doing something", "doing something");
+
+/*		Log.w("response", response);
 		for (String crn: crns) {
 			Log.w("crn", crn);
 		}*/
@@ -167,7 +196,6 @@ public class GetClasses extends Activity {
 			rowsArray.remove(rowsArray.size()-1); //always remove the last element
 		}
 		Course course = null;
-		HashMap<String,Course> courses = new HashMap<String,Course>();
 
 		for (Element row: rowsArray) {
 			Elements columns = row.select("td");
@@ -181,6 +209,10 @@ public class GetClasses extends Activity {
 			}
 			System.out.println("-----------------");
 			System.out.println("another check:  " + size);
+			//deal with comments in the page
+			if (size < 2) {
+				continue;
+			}
 			Element firstElement = columnsArray.get(0);
 			Element secondElement = columnsArray.get(1);
 			String firstElementText = firstElement.text();
@@ -191,36 +223,44 @@ public class GetClasses extends Activity {
 			Matcher crnMatcherFirst = p.matcher(firstElementText);
 			Matcher crnMatcherSecond = p.matcher(secondElementText);
 			String crn = "";
-			
+			String className = "";
 			if (crnMatcherFirst.find()) {
 				crn = crnMatcherFirst.group(0);
+				className = columnsArray.get(1).text();
 			}
 			else if (crnMatcherSecond.find()) {
 				crn = crnMatcherSecond.group(0);
+				className = columnsArray.get(2).text();
 			}
-			
 			if (!crn.equals("")) {
-				System.out.println("crn:  " + crn);
 				//start of a new class
-				course = new Course(crn);
+				course = new Course(className);
 			}
+			//this also handles multiple days
 			course = addToClass(columnsArray,course);
 			if (crns.contains(crn)) {
-				courses.put(crn,course);
+				course.addCRN(crn);
+				courses.put(className,course);
 			}
-
-			System.out.println("---------");
+			
+/*			if (crns.contains(crn)) {
+				//update the crn
+				course = new Course(className);
+				course = addToClass(columnsArray,course);
+				course.addCRN(crn);
+				courses.put(className,course);
+			}*/
 		}
-/*		Log.w("here", "i'm here");*/
-/*		Log.w("course keys", courses.keySet().size() + "");*/
 /*		for (String key: courses.keySet()) {
 			Log.w("course key", key);
 			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
-		}*/
+		}
+		Log.w("courses size", "courses size:  " + courses.keySet().size());*/
+/*		Log.w("here", "i'm here");*/
+/*		Log.w("course keys", courses.keySet().size() + "");*/
 	}
 	//gets crnAndDeptInfo and classUrls
 	public void getDepartmentLinks(String response) {		
-		Log.w("response", response);
 		Document doc = Jsoup.parse(response);
 		Elements links = doc.getElementsByTag("a");
 		
@@ -241,9 +281,6 @@ public class GetClasses extends Activity {
 /*					Log.w("dept", dept);*/
 					if (url.contains("=" + dept)) {
 						//add to hashmap
-						if (dept.equals("EE")) {
-							Log.w("Here","IT'S HERE");
-						}
 						ArrayList<String> crn = new ArrayList<String>();
 						//check if key already exists
 						if (crnAndDeptInfo.containsKey(dept)) {
@@ -253,8 +290,7 @@ public class GetClasses extends Activity {
 						else {
 							crn.add(data[CRN]);
 						}
-						crnAndDeptInfo.put(dept, crn);
-						
+						crnAndDeptInfo.put(dept, crn);	
 						//get the urls to search
 						if (!classUrls.containsKey(key)) {
 							classUrls.put(dept, url);
@@ -265,11 +301,11 @@ public class GetClasses extends Activity {
 			}
 		}
 		
-		Set<String> checkKeys = classUrls.keySet();
+/*		Set<String> checkKeys = classUrls.keySet();
 		for (String key: checkKeys) {
 			Log.w("key url","key:  " + key);
 			Log.w("value url","value:  " + classUrls.get(key));
-		}
+		}*/
 /*		Log.w("classDepts", classDepts.size() + "");*/
 	}
 	public static ArrayList<Element> convertToArray(Elements elements) {
@@ -329,9 +365,12 @@ public class GetClasses extends Activity {
 			String className = "";
 			String crnMatch = "";
 			
+			//Maybe restructure this part later on so don't repeat code
 			Matcher matcher = classNamePattern.matcher(text);
 			if (matcher.find()) {
 				className = matcher.group(0);
+				//strip - from class name
+				className = className.replace("-", " "); 
 /*				Log.w("Class Name"," name:  " + className);
 				Log.w("title", text);*/
 				matcher = crn.matcher(text);
@@ -342,13 +381,11 @@ public class GetClasses extends Activity {
 					//strip . from crn
 					crnMatch = crnMatch.replace(".", "");
 					
-					//strip - from class name
-					className = className.replace("-", " "); 
-					
 					matcher = searchClassPattern.matcher(className);
 					if (matcher.find()) {
 						String searchName = matcher.group(0);
 						String [] data = {crnMatch,url,searchName};
+						crns.add(crnMatch);
 						classInfo.put(className, data);
 					}	
 				}

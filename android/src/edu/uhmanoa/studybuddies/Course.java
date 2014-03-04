@@ -6,19 +6,25 @@ import java.util.ArrayList;
 public class Course {
 	ArrayList<String> times;
 	ArrayList<String> days;
-	String course;
-	
-	public Course(String course) {
-		this.course = course;
+	String crn;
+	String name;
+	public Course(String name) {
+		this.name = name;
 		times = new ArrayList<String>();
 		days = new ArrayList<String>();
+		crn = "None";
 	}
 	
 	public Course() {
 		times = new ArrayList<String>();
 		days = new ArrayList<String>();	
+		name = "";
+		crn = "None";
 	}
 	
+	public void addCRN(String crn) {
+		this.crn = crn;
+	}
 	public void addDay(String day) {
 		days.add(day);
 	}
@@ -27,6 +33,9 @@ public class Course {
 		times.add(time);
 	}
 	
+	public String getName() {
+		return name;
+	}
 	public ArrayList<String> getTimes() {
 		return times;
 	}
@@ -36,13 +45,16 @@ public class Course {
 	}
 	
 	public String toString() {
-		return "CRN:  " + course + " Times:  " + getStringOfTimes() + " Days:  " + getStringOfDays() + "\n";
+		return "CRN:  " + crn + " Times:  " + getStringOfTimes() + " Days:  " + getStringOfDays() + "\n";
 	}
 	
 	public String getStringOfTimes() {
 		String finalTime = "";
 		for (String time: times) {
 			finalTime = finalTime + time + " ";
+		}
+		if (finalTime.equals("")) {
+			return "None";
 		}
 		return finalTime;
 	}
@@ -52,7 +64,9 @@ public class Course {
 		for (String day: days) {
 			finalDays = finalDays + day + " ";
 		}
+		if (finalDays.equals("")) {
+			return "None";
+		}
 		return finalDays;
 	}
 }
-
