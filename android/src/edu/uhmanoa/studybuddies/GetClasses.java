@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -58,6 +59,8 @@ public class GetClasses extends Activity {
 	//keep track if done hitting dept urls
 	int counter = 0;
 	
+	ProgressDialog pd;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,6 +73,7 @@ public class GetClasses extends Activity {
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
 
 		//get classInfo
+		createDialog();
 		mLoginResponse = thisIntent.getStringExtra(Authenticate.LOGIN_RESPONSE);
 		getClassAndCRN(mLoginResponse);
 		
@@ -132,7 +136,6 @@ public class GetClasses extends Activity {
 						Course course = new Course(courseName);
 						courses.put(courseName, course);
 					}
-				
 					for (String className:  classes) {
 						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
 /*						Log.w("className", className);*/
@@ -148,12 +151,21 @@ public class GetClasses extends Activity {
 						Log.w("donezo", "we're finished");
 						hitAgain();
 						counter = 0;
+						pd.dismiss();
 					}
 /*					Log.w("response", response);*/
 					break;
 			}
         }
     }
+	
+	public void createDialog() {
+		pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
+		pd.setTitle("Gathering your class data..."); //make this a random fact later haha
+		pd.setMessage("Please wait.");
+		pd.setIndeterminate(true);
+		pd.show();
+	}
 	public void hitAgain() {
 		Log.w("blah", "blah");
 		for (String key: courses.keySet()) {
@@ -170,75 +182,81 @@ public class GetClasses extends Activity {
 	
 	//maybe this should return a hashmap of crn to time
 	public void getDayAndTime(String response) {
-		Log.w("doing something", "doing something");
-
-/*		Log.w("response", response);
-		for (String crn: crns) {
-			Log.w("crn", crn);
-		}*/
-		//use the searchName and the CRNS to find the times
-		//h1 tag has the searchName
-		//seperate between even and odd and then iterate
-		
-		Document doc = Jsoup.parse(response);
-		Elements rows = doc.select("tr");
-		ArrayList<Element> rowsArray = convertToArray(rows);
-		
-		//trim the fat off the arrays
-		rowsArray.remove(0);
-		int lengthOfRows = rowsArray.size();
-		System.out.println(lengthOfRows);
-		for (int i = lengthOfRows - 17; i < lengthOfRows; i++) {
-			rowsArray.remove(rowsArray.size()-1); //always remove the last element
-		}
-		Course course = null;
-
-		for (Element row: rowsArray) {
-			Elements columns = row.select("td");
+		try {
+			Log.w("doing something", "doing something");
+			Log.w("response", response);
+	/*		Log.w("response", response);
+			for (String crn: crns) {
+				Log.w("crn", crn);
+			}*/
+			//use the searchName and the CRNS to find the times
+			//h1 tag has the searchName
 			
-			//convert the columns to array for easier trimming
-			ArrayList<Element> columnsArray = convertToArray(columns);
-			int size = columnsArray.size();
-			System.out.println("size of columns:  " + size);
-			if (size == 30) { //for some reason this is needed
-				break;
-			}
-			System.out.println("-----------------");
-			System.out.println("another check:  " + size);
-			//deal with comments in the page
-			if (size < 2) {
-				continue;
-			}
-			Element firstElement = columnsArray.get(0);
-			Element secondElement = columnsArray.get(1);
-			String firstElementText = firstElement.text();
-			String secondElementText = secondElement.text();
+			Document doc = Jsoup.parse(response);
+			Elements rows = doc.select("tr");
+			ArrayList<Element> rowsArray = convertToArray(rows);
 			
-			//find crns in the first column or the second column
-			Pattern p = Pattern.compile("[0-9]{5}");
-			Matcher crnMatcherFirst = p.matcher(firstElementText);
-			Matcher crnMatcherSecond = p.matcher(secondElementText);
-			String crn = "";
-			String className = "";
-			if (crnMatcherFirst.find()) {
-				crn = crnMatcherFirst.group(0);
-				className = columnsArray.get(1).text();
+			//trim the fat off the arrays
+			rowsArray.remove(0);
+			int lengthOfRows = rowsArray.size();
+			System.out.println(lengthOfRows);
+			for (int i = lengthOfRows - 17; i < lengthOfRows; i++) {
+				rowsArray.remove(rowsArray.size()-1); //always remove the last element
 			}
-			else if (crnMatcherSecond.find()) {
-				crn = crnMatcherSecond.group(0);
-				className = columnsArray.get(2).text();
-			}
-			if (!crn.equals("")) {
-				//start of a new class
-				course = new Course(className);
-			}
-			//this also handles multiple days
-			course = addToClass(columnsArray,course);
-			if (crns.contains(crn)) {
-				course.addCRN(crn);
-				courses.put(className,course);
+			Course course = null;
+
+			for (Element row: rowsArray) {
+				Elements columns = row.select("td");
+				
+				//convert the columns to array for easier trimming
+				ArrayList<Element> columnsArray = convertToArray(columns);
+				int size = columnsArray.size();
+				System.out.println("size of columns:  " + size);
+				if (size == 30) { //for some reason this is needed
+					break;
+				}
+				System.out.println("-----------------");
+				System.out.println("another check:  " + size);
+				//deal with comments in the page
+				if (size < 2) {
+					continue;
+				}
+				Element firstElement = columnsArray.get(0);
+				Element secondElement = columnsArray.get(1);
+				String firstElementText = firstElement.text();
+				String secondElementText = secondElement.text();
+				
+				//find crns in the first column or the second column
+				Pattern p = Pattern.compile("[0-9]{5}");
+				Matcher crnMatcherFirst = p.matcher(firstElementText);
+				Matcher crnMatcherSecond = p.matcher(secondElementText);
+				String crn = "";
+				String className = "";
+				if (crnMatcherFirst.find()) {
+					crn = crnMatcherFirst.group(0);
+					className = columnsArray.get(1).text();
+				}
+				else if (crnMatcherSecond.find()) {
+					crn = crnMatcherSecond.group(0);
+					className = columnsArray.get(2).text();
+				}
+				if (!crn.equals("")) {
+					//start of a new class
+					course = new Course(className);
+				}
+				//this also handles multiple days
+				course = addToClass(columnsArray,course);
+				if (crns.contains(crn)) {
+					course.addCRN(crn);
+					courses.put(className,course);
+				}
 			}
 		}
+		catch (Exception e) {
+			// show an error dialog
+			e.printStackTrace();
+		}
+		
 /*		for (String key: courses.keySet()) {
 			Log.w("course key", key);
 			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));

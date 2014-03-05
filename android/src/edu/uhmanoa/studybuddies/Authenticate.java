@@ -1,9 +1,6 @@
 package edu.uhmanoa.studybuddies;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
@@ -19,7 +16,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
