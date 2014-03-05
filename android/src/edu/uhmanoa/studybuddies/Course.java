@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 //arrayLists always maintain the order
 public class Course {
-	ArrayList<String> times;
-	ArrayList<String> days;
-	String crn;
-	String name;
+	private ArrayList<String> times;
+	private ArrayList<String> days;
+	private String crn;
+	private String name;
+	private int id;
+	
 	public Course(String name) {
 		this.name = name;
 		times = new ArrayList<String>();
@@ -20,6 +22,14 @@ public class Course {
 		days = new ArrayList<String>();	
 		name = "";
 		crn = "None";
+	}
+	
+	/*This is from the database*/
+	public void setID(int id) {
+		this.id = id;
+	}
+	public int getID() {
+		return this.id;
 	}
 	
 	public void addCRN(String crn) {
