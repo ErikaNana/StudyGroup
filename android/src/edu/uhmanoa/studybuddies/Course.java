@@ -8,7 +8,8 @@ public class Course {
 	private ArrayList<String> days;
 	private String crn;
 	private String name;
-	private int id;
+	private String fullTime;
+	private String fullDays;
 	
 	public Course(String name) {
 		this.name = name;
@@ -24,14 +25,6 @@ public class Course {
 		crn = "None";
 	}
 	
-	/*This is from the database*/
-	public void setID(int id) {
-		this.id = id;
-	}
-	public int getID() {
-		return this.id;
-	}
-	
 	public void addCRN(String crn) {
 		this.crn = crn;
 	}
@@ -43,6 +36,9 @@ public class Course {
 		times.add(time);
 	}
 	
+	public void setName (String name) {
+		this.name = name;
+	}
 	public String getName() {
 		return name;
 	}
@@ -66,7 +62,8 @@ public class Course {
 		if (finalTime.equals("")) {
 			return "None";
 		}
-		return finalTime;
+		fullTime = finalTime;
+		return fullTime;
 	}
 	
 	public String getStringOfDays() {
@@ -77,6 +74,16 @@ public class Course {
 		if (finalDays.equals("")) {
 			return "None";
 		}
-		return finalDays;
+		fullDays = finalDays;
+		return fullDays;
+	}
+	
+	//for recreating
+	public void setFullTime(String fullTime) {
+		this.fullTime = fullTime;
+	}
+	
+	public void setFullDays(String fullDays) {
+		this.fullDays = fullDays;
 	}
 }

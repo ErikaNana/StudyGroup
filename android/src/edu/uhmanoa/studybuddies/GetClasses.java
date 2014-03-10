@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.TextView;
 
 //NEED TO FIX COMG 251 MWF bug, right now only giving M
 
@@ -60,6 +61,7 @@ public class GetClasses extends Activity {
 	int counter = 0;
 	
 	ProgressDialog pd;
+	TextView mNumberOfClasses;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,11 @@ public class GetClasses extends Activity {
 		classUrls = new HashMap<String, String>();
 		courses = new HashMap<String,Course>();
 		crns = new ArrayList<String>();
+		
+		//views
+		setContentView(R.layout.get_classes);
+		mNumberOfClasses = (TextView) findViewById(R.id.numberOfClasses);
+		Log.w("number of classes", mNumberOfClasses.toString());
 		Intent thisIntent = this.getIntent();
 		//get cookies 
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
@@ -143,13 +150,14 @@ public class GetClasses extends Activity {
 					}
 					Log.w("donezo", "donezo");
 					break;
-				case GET_TIME_FROM_DEPARTMENT:
+				case GET_TIME_FROM_DEPARTMENT: //gets the classes for each department
 					getDayAndTime(response);
 					counter++;
+					//set up activity to display the classes
 					Log.w("counter","counter:  " + counter);
 					if (counter == classUrls.keySet().size()) {
 						Log.w("donezo", "we're finished");
-						hitAgain();
+						displayClasses();
 						counter = 0;
 						pd.dismiss();
 					}
@@ -162,16 +170,20 @@ public class GetClasses extends Activity {
 	public void createDialog() {
 		pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
 		pd.setTitle("Gathering your class data..."); //make this a random fact later haha
-		pd.setMessage("Please wait.");
+		pd.setMessage("This might take a while");
 		pd.setIndeterminate(true);
 		pd.show();
 	}
-	public void hitAgain() {
+	public void displayClasses() {
+		//Set the text for number of classes found
+		mNumberOfClasses.setText("Found " + courses.size() + " classes");
+		//display classes and their info in a list view
 		Log.w("blah", "blah");
 		for (String key: courses.keySet()) {
 			Log.w("course key", key);
 			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
 		}
+		//store the classes in the database
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -183,8 +195,8 @@ public class GetClasses extends Activity {
 	//maybe this should return a hashmap of crn to time
 	public void getDayAndTime(String response) {
 		try {
-			Log.w("doing something", "doing something");
-			Log.w("response", response);
+/*			Log.w("doing something", "doing something");
+			Log.w("response", response);*/
 	/*		Log.w("response", response);
 			for (String crn: crns) {
 				Log.w("crn", crn);
@@ -308,6 +320,10 @@ public class GetClasses extends Activity {
 			}
 		}
 		return elementsArray;
+	}
+		
+	public void storeClasses() {
+		
 	}
 	
 	public static Course addToClass(ArrayList<Element> array, Course course) {

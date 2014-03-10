@@ -90,6 +90,7 @@ public class Authenticate extends Activity implements OnClickListener {
 			try {
 				Connection.Response res = Jsoup.connect(urls[0])
 						.data("eid", mUserName)
+						.timeout(3000)
 						.data("pw", mPassword)
 						.data("submit","Login")
 						.method(Method.POST)
