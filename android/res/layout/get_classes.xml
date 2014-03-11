@@ -7,21 +7,35 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".GetClasses" >
-
-    <TextView 
-        android:id="@+id/numberOfClasses"
+    <RelativeLayout 
+        android:id="@+id/topLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:typeface="sans"
-        android:textStyle="bold"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        /> 
-        <ListView 
-          android:id="@+id/listOfClasses"
+        android:layout_height="wrap_content">
+      <TextView 
+          android:id="@+id/numberOfClasses"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_below="@+id/numberOfClasses">
-        </ListView>
+          android:textSize="22sp"
+          android:typeface="sans"
+          android:textStyle="bold"
+          android:layout_alignParentRight="true"
+          android:layout_alignParentTop="true"
+          /> 
+       <ListView 
+            android:id="@+id/listOfClasses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/numberOfClasses">
+          </ListView>
+    </RelativeLayout>
+    <Button
+        android:id="@+id/getRosterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/topLayout"
+        android:layout_centerHorizontal="true"
+        android:text="@string/getRoster"
+        android:paddingTop="10dip"
+        android:visibility="invisible"
+        android:textSize="@dimen/textSize" />
 </RelativeLayout>

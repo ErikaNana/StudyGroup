@@ -14,5 +14,6 @@
     <string name="passwordHint">Password</string>
     <string name="loginButtonText">Login</string>
     <string name="title_activity_get_classes">GetClasses</string>
+    <string name="getRoster">Get Rosters</string>
 
 </resources>

@@ -26,6 +26,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,7 +72,7 @@ public class GetClasses extends Activity {
 	ListView mListOfClassesListView;
 	ArrayList<Course> mListOfClasses;
 	CourseAdapter mAdapter;
-	
+	Button mGetRosters;
 	
 	//for the scroll view listener
 	int mCurrentVisibleItemCount;
@@ -103,8 +104,8 @@ public class GetClasses extends Activity {
 		mNumberOfClasses = (TextView) findViewById(R.id.numberOfClasses);
 		mListOfClassesListView = (ListView) findViewById(R.id.listOfClasses);
 		mListOfClasses = new ArrayList<Course>();
+		mGetRosters = (Button) findViewById(R.id.getRosterButton);
 		
-		Log.w("number of classes", mNumberOfClasses.toString());
 		Intent thisIntent = this.getIntent();
 		//get cookies 
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
@@ -266,6 +267,9 @@ public class GetClasses extends Activity {
 		if (mAdapter != null) {
 			mAdapter.notifyDataSetChanged();
 		}
+		
+		//display the button
+		mGetRosters.setVisibility(View.VISIBLE);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
