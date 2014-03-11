@@ -51,9 +51,10 @@ public class Course {
 	}
 	
 	public String toString() {
-		return "CRN:  " + crn + " Times:  " + getStringOfTimes() + " Days:  " + getStringOfDays() + "\n";
+		return "Name:  " + name + " Times:  " + fullTime + " Days:  " + fullDays + "\n";
 	}
 	
+	//idk what these two methods would be for...just for testing attribute assignment?
 	public String getStringOfTimes() {
 		String finalTime = "";
 		for (String time: times) {

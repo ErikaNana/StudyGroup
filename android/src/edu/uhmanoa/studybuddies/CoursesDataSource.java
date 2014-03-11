@@ -1,5 +1,7 @@
 package edu.uhmanoa.studybuddies;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -27,6 +29,11 @@ public class CoursesDataSource {
 		helper.close();
 	}
 	
+	public void deleteAll() {
+		database = helper.getWritableDatabase();
+		//null so delete all the rows
+		database.delete(SQLiteHelper.TABLE_NAME, null, null);
+	}
 	public void addCourse (Course course) {
 		ContentValues values = new ContentValues();
 		//figure out what to do with column_id? Or maybe you don't need it
@@ -35,8 +42,25 @@ public class CoursesDataSource {
 		values.put(SQLiteHelper.COLUMN_TIMES, course.getStringOfTimes());
 		
 		database.insert(SQLiteHelper.TABLE_NAME, null, values);
-		
-		database.close();
+	}
+	
+	public ArrayList<Course> getAllCourses(){
+		ArrayList<Course> courses = new ArrayList<Course>();
+		Cursor cursor = database.query(SQLiteHelper.TABLE_NAME, allColumns, null, null, null, null, null);
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			//create a course object from each row in the table
+			String name = cursor.getString(0);
+			String days = cursor.getString(1);
+			String times = cursor.getString(2);
+			Course course = new Course(name);
+			course.setFullTime(times);
+			course.setFullDays(days);
+			courses.add(course);
+			cursor.moveToNext();
+		}
+		cursor.close();
+		return courses;
 	}
 	
 	//maybe change this so can get course by name? (names are unique anyway, so maybe don't need autoincrement thing

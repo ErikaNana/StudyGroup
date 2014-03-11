@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//NEED TO FIX COMG 251 MWF bug, right now only giving M
 
 public class GetClasses extends Activity {
 	public static final String ROOT_URL = "https://www.sis.hawaii.edu/uhdad/avail.classes?i=MAN";
@@ -82,6 +81,9 @@ public class GetClasses extends Activity {
 	int mNumberOfItemsFit;
 	Course mCourseLookingAt;
 	
+	//database
+	private CoursesDataSource coursesDb;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -89,6 +91,12 @@ public class GetClasses extends Activity {
 		classUrls = new HashMap<String, String>();
 		courses = new HashMap<String,Course>();
 		crns = new ArrayList<String>();
+		
+		//database
+		coursesDb = new CoursesDataSource(this);
+		//delete any existing info
+		coursesDb.deleteAll();
+		coursesDb.open();
 		
 		//views
 		setContentView(R.layout.get_classes);
@@ -194,12 +202,10 @@ public class GetClasses extends Activity {
 		    		
 					break;
 				case CONNECT_DEPARTMENTS:
-/*					Log.w("response", response);*/
 					getDepartmentLinks(response);
 					
 					//go to individual department pages and get time
 					Set<String> classes = classUrls.keySet();
-/*					Log.w("length of classes", classes.size() + "");*/
 					
 					//initialize classes, if there are times then they will be overidden
 					Log.w("crn length", crns.size() + "");
@@ -209,7 +215,6 @@ public class GetClasses extends Activity {
 					}
 					for (String className:  classes) {
 						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
-/*						Log.w("className", className);*/
 						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});
 					}
 					Log.w("donezo", "donezo");
@@ -225,7 +230,6 @@ public class GetClasses extends Activity {
 						counter = 0;
 						pd.dismiss();
 					}
-/*					Log.w("response", response);*/
 					break;
 			}
         }
@@ -244,20 +248,24 @@ public class GetClasses extends Activity {
 	public void displayClasses() {
 		//Set the text for number of classes found
 		mNumberOfClasses.setText("Found " + courses.size() + " classes");
-		//display class names in a list view
-		for (String course: courses.keySet()) {
-			mListOfClasses.add(courses.get(course));
+		
+		//put the classes in the database
+		for (String courseName: courses.keySet()) {
+			Course course = courses.get(courseName);
+			coursesDb.addCourse(course);
 		}
-		//update
+		
+		//for some reason can't just straight up assign it
+		ArrayList<Course> classes = coursesDb.getAllCourses();
+		for (Course course: classes) {
+			mListOfClasses.add(course);
+		}
+		
+		coursesDb.close();
+		//update the view
 		if (mAdapter != null) {
 			mAdapter.notifyDataSetChanged();
 		}
-/*		Log.w("blah", "blah");
-		for (String key: courses.keySet()) {
-			Log.w("course key", key);
-			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
-		}*/
-		//store the classes in the database
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -269,12 +277,6 @@ public class GetClasses extends Activity {
 	//maybe this should return a hashmap of crn to time
 	public void getDayAndTime(String response) {
 		try {
-/*			Log.w("doing something", "doing something");
-			Log.w("response", response);*/
-	/*		Log.w("response", response);
-			for (String crn: crns) {
-				Log.w("crn", crn);
-			}*/
 			//use the searchName and the CRNS to find the times
 			//h1 tag has the searchName
 			
@@ -342,14 +344,6 @@ public class GetClasses extends Activity {
 			// show an error dialog
 			e.printStackTrace();
 		}
-		
-/*		for (String key: courses.keySet()) {
-			Log.w("course key", key);
-			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
-		}
-		Log.w("courses size", "courses size:  " + courses.keySet().size());*/
-/*		Log.w("here", "i'm here");*/
-/*		Log.w("course keys", courses.keySet().size() + "");*/
 	}
 	//gets crnAndDeptInfo and classUrls
 	public void getDepartmentLinks(String response) {		
@@ -377,13 +371,6 @@ public class GetClasses extends Activity {
 				}
 			}
 		}
-		
-/*		Set<String> checkKeys = classUrls.keySet();
-		for (String key: checkKeys) {
-			Log.w("key url","key:  " + key);
-			Log.w("value url","value:  " + classUrls.get(key));
-		}*/
-/*		Log.w("classDepts", classDepts.size() + "");*/
 	}
 	public static ArrayList<Element> convertToArray(Elements elements) {
 		ArrayList<Element> elementsArray = new ArrayList<Element>();
@@ -396,10 +383,6 @@ public class GetClasses extends Activity {
 		return elementsArray;
 	}
 		
-	public void storeClasses() {
-		
-	}
-	
 	public static Course addToClass(ArrayList<Element> array, Course course) {
 		int arrayLength = array.size();
 		String classTime = array.get(arrayLength - 3).text();
@@ -452,8 +435,6 @@ public class GetClasses extends Activity {
 				className = matcher.group(0);
 				//strip - from class name
 				className = className.replace("-", " "); 
-/*				Log.w("Class Name"," name:  " + className);
-				Log.w("title", text);*/
 				matcher = crn.matcher(text);
 				
 				if (matcher.find()) {
@@ -483,14 +464,5 @@ public class GetClasses extends Activity {
 				}
 			}
 		}
-		/*Log.w("classInfo", classInfo.toString());*/
-/*		for (String key: classInfo.keySet()) {
-			Log.w("classInfo", "key:  " + key);
-			String[] elements = classInfo.get(key);
-			for (String element: elements) {
-				Log.w("classInfo", element);
-			}
-		}*/
-		Log.w("classInfo", "classInfo size:  " + classInfo.size());
 	}
 }
