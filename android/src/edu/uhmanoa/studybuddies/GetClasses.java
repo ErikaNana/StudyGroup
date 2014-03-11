@@ -21,7 +21,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //NEED TO FIX COMG 251 MWF bug, right now only giving M
 
@@ -62,6 +69,18 @@ public class GetClasses extends Activity {
 	
 	ProgressDialog pd;
 	TextView mNumberOfClasses;
+	ListView mListOfClassesListView;
+	ArrayList<Course> mListOfClasses;
+	CourseAdapter mAdapter;
+	
+	
+	//for the scroll view listener
+	int mCurrentVisibleItemCount;
+	int mCurrentScrollState;
+	int mTotalItemCount;
+	int mCurrentFirstVisibleItem;
+	int mNumberOfItemsFit;
+	Course mCourseLookingAt;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +93,9 @@ public class GetClasses extends Activity {
 		//views
 		setContentView(R.layout.get_classes);
 		mNumberOfClasses = (TextView) findViewById(R.id.numberOfClasses);
+		mListOfClassesListView = (ListView) findViewById(R.id.listOfClasses);
+		mListOfClasses = new ArrayList<Course>();
+		
 		Log.w("number of classes", mNumberOfClasses.toString());
 		Intent thisIntent = this.getIntent();
 		//get cookies 
@@ -87,6 +109,48 @@ public class GetClasses extends Activity {
 		Connect getSemester = new Connect(CONNECT_CURRENT_SEMESTER);
 		getSemester.execute(new String [] {ROOT_URL});
 		
+		//set the adapter
+		mAdapter = new CourseAdapter(this, R.id.listOfClasses, mListOfClasses);
+		mListOfClassesListView.setAdapter(mAdapter);
+		
+		//set a scroll listener
+		mListOfClassesListView.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				mCurrentScrollState = scrollState;
+				checkScrollCompleted();
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				mNumberOfItemsFit = visibleItemCount;
+				mCurrentFirstVisibleItem = firstVisibleItem;
+				mTotalItemCount = totalItemCount;
+				
+			}
+			public void checkScrollCompleted() {
+				if (mCurrentFirstVisibleItem ==(mTotalItemCount - mNumberOfItemsFit)) {
+					if (mCurrentScrollState == SCROLL_STATE_IDLE) {
+						//we're at the bottom
+						return;
+					}
+				}
+			}
+		});
+		
+		//listen for a click
+		mListOfClassesListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				mCourseLookingAt = (Course) mListOfClassesListView.getItemAtPosition(position);
+				//change this for later
+				launchGetDescription(mCourseLookingAt);
+			}	
+		});
 	}
 	
 	private class Connect extends AsyncTask <String, Void, String>{
@@ -166,7 +230,10 @@ public class GetClasses extends Activity {
 			}
         }
     }
-	
+	private void launchGetDescription(Course mCourseLookingAt) {
+		Toast.makeText(getBaseContext(), mCourseLookingAt.toString(), Toast.LENGTH_SHORT).show();
+		
+	}	
 	public void createDialog() {
 		pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
 		pd.setTitle("Gathering your class data..."); //make this a random fact later haha
@@ -177,12 +244,19 @@ public class GetClasses extends Activity {
 	public void displayClasses() {
 		//Set the text for number of classes found
 		mNumberOfClasses.setText("Found " + courses.size() + " classes");
-		//display classes and their info in a list view
-		Log.w("blah", "blah");
+		//display class names in a list view
+		for (String course: courses.keySet()) {
+			mListOfClasses.add(courses.get(course));
+		}
+		//update
+		if (mAdapter != null) {
+			mAdapter.notifyDataSetChanged();
+		}
+/*		Log.w("blah", "blah");
 		for (String key: courses.keySet()) {
 			Log.w("course key", key);
 			Log.w("getDayAndTime","key:  " + key + "\n" + courses.get(key));
-		}
+		}*/
 		//store the classes in the database
 	}
 	@Override

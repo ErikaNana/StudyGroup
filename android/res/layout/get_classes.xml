@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         /> 
         <ListView 
-          android:id="@+id/listOfJobs"
+          android:id="@+id/listOfClasses"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_below="@+id/numberOfClasses">
