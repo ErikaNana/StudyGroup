@@ -93,6 +93,10 @@ public class GetClasses extends Activity {
 	//database
 	private CoursesDataSource coursesDb;
 	
+	//for determining where rosters belong to
+	String classForRoster = "";
+	HashMap<String, ArrayList<Classmate>> classRosterMap;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,7 +104,7 @@ public class GetClasses extends Activity {
 		classUrls = new HashMap<String, String>();
 		courses = new HashMap<String,Course>();
 		crns = new ArrayList<String>();
-		
+		classRosterMap = new HashMap<String, ArrayList<Classmate>>();
 		//database
 		coursesDb = new CoursesDataSource(this);
 		//delete any existing info
@@ -302,13 +306,17 @@ public class GetClasses extends Activity {
 		for (Classmate student: students) {
 			Log.w("students", student.toString());
 		}
+		//this is where the end will be after getting all of the rosters for all of the classes
+		//persist this in shared preferences or something just in case screen change or something
+		classRosterMap.put(classForRoster, students);
 	}
 	public void getRosters() {
 		createDialog(GET_ROSTERS);
 		//just get the first one for now
-		String[] testData = classInfo.get("EE 496");
+		String[] testData = classInfo.get("ICS 491");
 		String url = testData[URL];
-		
+		String className = "ICS 491";
+		classForRoster = className;
 		Connect overallPage = new Connect(GET_MAIN_CLASS_PAGE, GET_ROSTERS);
 		overallPage.execute(new String [] {url});
 		//get the next relevant url from the response and keep going until you get the students
