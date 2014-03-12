@@ -28,14 +28,4 @@
             android:layout_below="@+id/numberOfClasses">
           </ListView>
     </RelativeLayout>
-    <Button
-        android:id="@+id/getRosterButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/topLayout"
-        android:layout_centerHorizontal="true"
-        android:text="@string/getRoster"
-        android:paddingTop="10dip"
-        android:visibility="invisible"
-        android:textSize="@dimen/textSize" />
 </RelativeLayout>

@@ -26,7 +26,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,11 +46,12 @@ public class GetClasses extends Activity {
 	public static final int GET_MAIL_TOOL = 7;
 	public static final int GET_ROLES_SECTIONS_GROUPS = 8;
 	public static final int GET_JUST_ROLES = 9;
-	public static final int GET_STUDENTS = 10;
+	public static final int GET_STUDENTS_PAGE = 10;
+	public static final int GET_STUDENTS = 11;
 	
 	//for dialogs
-	public static final int GET_CLASS_INFO = 11;
-	public static final int GET_ROSTERS = 12;
+	public static final int GET_CLASS_INFO = 12;
+	public static final int GET_ROSTERS = 13;
 	
 	//get class availability
 	String BASE_URL = "https://www.sis.hawaii.edu/uhdad";
@@ -81,7 +81,6 @@ public class GetClasses extends Activity {
 	ListView mListOfClassesListView;
 	ArrayList<Course> mListOfClasses;
 	CourseAdapter mAdapter;
-	Button mGetRosters;
 	
 	//for the scroll view listener
 	int mCurrentVisibleItemCount;
@@ -113,7 +112,6 @@ public class GetClasses extends Activity {
 		mNumberOfClasses = (TextView) findViewById(R.id.numberOfClasses);
 		mListOfClassesListView = (ListView) findViewById(R.id.listOfClasses);
 		mListOfClasses = new ArrayList<Course>();
-		mGetRosters = (Button) findViewById(R.id.getRosterButton);
 		
 		Intent thisIntent = this.getIntent();
 		//get cookies 
@@ -124,7 +122,7 @@ public class GetClasses extends Activity {
 		mLoginResponse = thisIntent.getStringExtra(Authenticate.LOGIN_RESPONSE);
 		getClassAndCRN(mLoginResponse);
 		
-		Connect getSemester = new Connect(CONNECT_CURRENT_SEMESTER);
+		Connect getSemester = new Connect(CONNECT_CURRENT_SEMESTER, GET_CLASS_INFO);
 		getSemester.execute(new String [] {ROOT_URL});
 		
 		//set the adapter
@@ -165,7 +163,7 @@ public class GetClasses extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 				mCourseLookingAt = (Course) mListOfClassesListView.getItemAtPosition(position);
-				//change this for later
+				//change this for later take them to activity with their classmates listed in a listView
 				launchGetDescription(mCourseLookingAt);
 			}	
 		});
@@ -174,9 +172,11 @@ public class GetClasses extends Activity {
 	private class Connect extends AsyncTask <String, Void, String>{
 		
 		int which = 0;
+		int type = 0;
 		
-		public Connect(int which) {
+		public Connect(int which, int type) {
 			this.which = which;
+			this.type = type;
 		}
 		
 		@Override
@@ -184,20 +184,25 @@ public class GetClasses extends Activity {
 			Document resDoc = null;
 			String response = "";
 			
-			try {				
-				//Connect to the page with all of the classes
-				Connection.Response res = Jsoup.connect(urls[0])
-						.method(Method.GET)
-						.execute();
-				resDoc = res.parse();
-				response = resDoc.toString();
-				
-				switch(which) {
-					
-				}
+			try {
 				//get the cookie from previous authentication and hit each url in classInfo 
 				//get the rosters
 				//update classinfo hashmap
+				if (type == GET_CLASS_INFO) {
+					//Connect to the page with all of the classes
+					Connection.Response res = Jsoup.connect(urls[0])
+							.method(Method.GET)
+							.execute();
+					resDoc = res.parse();
+					response = resDoc.toString();	
+				}
+				else { 
+					resDoc = Jsoup.connect(urls[0])
+							.cookie(Authenticate.COOKIE_TYPE, mCookieValue)
+							.get();
+
+					response = resDoc.toString();
+				}
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -215,7 +220,7 @@ public class GetClasses extends Activity {
 		        	link = BASE_URL + link;
 		        	
 		        	//connect to the pages with departments
-		        	Connect getSemester = new Connect(CONNECT_DEPARTMENTS);
+		        	Connect getSemester = new Connect(CONNECT_DEPARTMENTS, GET_CLASS_INFO);
 		    		getSemester.execute(new String [] {link});
 		    		
 					break;
@@ -232,7 +237,7 @@ public class GetClasses extends Activity {
 						courses.put(courseName, course);
 					}
 					for (String className:  classes) {
-						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT);
+						Connect getTimes = new Connect(GET_TIME_FROM_DEPARTMENT, GET_CLASS_INFO);
 						getTimes.execute(new String [] {BASE_URL + classUrls.get(className)});
 					}
 					Log.w("donezo", "donezo");
@@ -248,9 +253,44 @@ public class GetClasses extends Activity {
 						counter = 0;
 						pd.dismiss();
 						getRosters();
-						pd.dismiss();
 					}
 					break;
+/*					public static final int GET_ROLES_SECTIONS_GROUPS = 8;
+					public static final int GET_JUST_ROLES = 9;
+					public static final int GET_STUDENTS = 10*/
+				case GET_MAIN_CLASS_PAGE:
+					Log.w("GET_MAIN", "main");
+					String mailURL = RosterUtils.getMailToolURL(response);
+					Connect getRolesSectionGroupsPage = new Connect(GET_ROLES_SECTIONS_GROUPS, GET_ROSTERS);
+					getRolesSectionGroupsPage.execute(new String [] {mailURL});
+					break;
+				
+				case GET_ROLES_SECTIONS_GROUPS:
+					Log.w("GET_sections", "sections");
+					String getRolesSectionGroupsPageURL = RosterUtils.getRolesSectionGroupsPage(response);
+					Connect getRoles = new Connect(GET_JUST_ROLES, GET_ROSTERS);
+					getRoles.execute(new String [] {getRolesSectionGroupsPageURL});
+					break;
+					
+				case GET_JUST_ROLES:
+					Log.w("GET_Roles", "roles");
+					String getStudentRoleURL = RosterUtils.getStudentRole(response);
+					Connect getStudentRole = new Connect(GET_STUDENTS_PAGE, GET_ROSTERS);
+					getStudentRole.execute(new String [] {getStudentRoleURL});
+					break;
+				
+				case GET_STUDENTS_PAGE:
+					Log.w("GET_student page", "student page");
+					String getStudentsURL = RosterUtils.getStudentsPage(response);
+					Connect getStudentsPage = new Connect(GET_STUDENTS, GET_ROSTERS);
+					getStudentsPage.execute(new String [] {getStudentsURL});
+					break;
+					
+				case GET_STUDENTS:
+					Log.w("response", response);
+					pd.dismiss();
+					//get list of students
+					//pass that to formatRosters
 			}
         }
     }
@@ -258,8 +298,18 @@ public class GetClasses extends Activity {
 		Toast.makeText(getBaseContext(), mCourseLookingAt.toString(), Toast.LENGTH_SHORT).show();
 		
 	}
+	//this method gets classmate objects and puts them in the database
+	public void updateWithRosters() {
+		
+	}
 	public void getRosters() {
 		createDialog(GET_ROSTERS);
+		//just get the first one for now
+		String[] testData = classInfo.get("EE 496");
+		String url = testData[URL];
+		
+		Connect overallPage = new Connect(GET_MAIN_CLASS_PAGE, GET_ROSTERS);
+		overallPage.execute(new String [] {url});
 		//get the next relevant url from the response and keep going until you get the students
 	}
 	public void createDialog(int type) {
@@ -270,8 +320,8 @@ public class GetClasses extends Activity {
 				pd.setMessage("This might take a while");
 				break;
 			case GET_ROSTERS:
-				pd.setTitle("Getting potential group members...");
-				pd.setMessage("I promise this is the last one!");
+				pd.setTitle("Getting your classmates...");
+				pd.setMessage("Can't have a group without people right?");
 				break;
 		}
 		pd.setIndeterminate(true);
@@ -279,7 +329,7 @@ public class GetClasses extends Activity {
 	}
 	public void displayClasses() {
 		//Set the text for number of classes found
-		mNumberOfClasses.setText("Found " + courses.size() + " classes");
+		mNumberOfClasses.setText("Click a class to get started");
 		
 		//put the classes in the database
 		for (String courseName: courses.keySet()) {
@@ -298,9 +348,6 @@ public class GetClasses extends Activity {
 		if (mAdapter != null) {
 			mAdapter.notifyDataSetChanged();
 		}
-		
-		//display the button
-		mGetRosters.setVisibility(View.VISIBLE);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
