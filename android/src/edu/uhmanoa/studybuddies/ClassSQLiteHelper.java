@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class SQLiteHelper extends SQLiteOpenHelper {
+public class ClassSQLiteHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "classinfo.db";
 	public static final String TABLE_NAME = "classinfo";
 /*	public static final String COLUMN_ID = "_id";*/
@@ -24,7 +24,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 	// Database creation SQL statement
 	private static final String DATABASE_CREATE = "create table " + TABLE_NAME + "(" + COLUMN_CLASS_NAME + " text not null," + COLUMN_DAYS + " text not null," + COLUMN_TIMES + " text not null" + ")";
 	
-	public SQLiteHelper(Context context) {
+	public ClassSQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 	@Override

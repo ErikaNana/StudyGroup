@@ -14,11 +14,11 @@ public class CoursesDataSource {
 
 	//Database fields
 	private SQLiteDatabase database;
-	private SQLiteHelper helper; 
-	private String[] allColumns = {SQLiteHelper.COLUMN_CLASS_NAME, SQLiteHelper.COLUMN_DAYS, SQLiteHelper.COLUMN_TIMES};
+	private ClassSQLiteHelper helper; 
+	private String[] allColumns = {ClassSQLiteHelper.COLUMN_CLASS_NAME, ClassSQLiteHelper.COLUMN_DAYS, ClassSQLiteHelper.COLUMN_TIMES};
 
 	public CoursesDataSource(Context context) {
-		helper = new SQLiteHelper(context);
+		helper = new ClassSQLiteHelper(context);
 	}
 	
 	public void open() throws SQLException{
@@ -32,21 +32,21 @@ public class CoursesDataSource {
 	public void deleteAll() {
 		database = helper.getWritableDatabase();
 		//null so delete all the rows
-		database.delete(SQLiteHelper.TABLE_NAME, null, null);
+		database.delete(ClassSQLiteHelper.TABLE_NAME, null, null);
 	}
 	public void addCourse (Course course) {
 		ContentValues values = new ContentValues();
 		//figure out what to do with column_id? Or maybe you don't need it
-		values.put(SQLiteHelper.COLUMN_CLASS_NAME, course.getName());
-		values.put(SQLiteHelper.COLUMN_DAYS, course.getStringOfDays());
-		values.put(SQLiteHelper.COLUMN_TIMES, course.getStringOfTimes());
+		values.put(ClassSQLiteHelper.COLUMN_CLASS_NAME, course.getName());
+		values.put(ClassSQLiteHelper.COLUMN_DAYS, course.getStringOfDays());
+		values.put(ClassSQLiteHelper.COLUMN_TIMES, course.getStringOfTimes());
 		
-		database.insert(SQLiteHelper.TABLE_NAME, null, values);
+		database.insert(ClassSQLiteHelper.TABLE_NAME, null, values);
 	}
 	
 	public ArrayList<Course> getAllCourses(){
 		ArrayList<Course> courses = new ArrayList<Course>();
-		Cursor cursor = database.query(SQLiteHelper.TABLE_NAME, allColumns, null, null, null, null, null);
+		Cursor cursor = database.query(ClassSQLiteHelper.TABLE_NAME, allColumns, null, null, null, null, null);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			//create a course object from each row in the table
@@ -67,7 +67,7 @@ public class CoursesDataSource {
 	public Course getCourse(String name) {
 		//see if this is the right thing to call
 		SQLiteDatabase db = helper.getReadableDatabase();
-		String selectQuery = "SELECT * FROM " + SQLiteHelper.TABLE_NAME + "WHERE " + SQLiteHelper.COLUMN_CLASS_NAME + " = " + name;
+		String selectQuery = "SELECT * FROM " + ClassSQLiteHelper.TABLE_NAME + "WHERE " + ClassSQLiteHelper.COLUMN_CLASS_NAME + " = " + name;
 		Log.w("CoursesDataSource", selectQuery);
 		
 		Cursor c = db.rawQuery(selectQuery, null);
@@ -77,9 +77,9 @@ public class CoursesDataSource {
 		}
 		
 		//get info out of the db
-		int nameIndex = c.getColumnIndex(SQLiteHelper.COLUMN_CLASS_NAME);
-		int daysIndex = c.getColumnIndex(SQLiteHelper.COLUMN_DAYS);
-		int timesIndex = c.getColumnIndex(SQLiteHelper.COLUMN_TIMES);
+		int nameIndex = c.getColumnIndex(ClassSQLiteHelper.COLUMN_CLASS_NAME);
+		int daysIndex = c.getColumnIndex(ClassSQLiteHelper.COLUMN_DAYS);
+		int timesIndex = c.getColumnIndex(ClassSQLiteHelper.COLUMN_TIMES);
 		
 		String courseName = c.getString(nameIndex);
 		String days = c.getString(daysIndex);
@@ -97,6 +97,6 @@ public class CoursesDataSource {
 	
 	public void deleteCourse(Course course) {
 		String name = course.getName();
-		database.delete(SQLiteHelper.TABLE_NAME, SQLiteHelper.COLUMN_CLASS_NAME + " = " + name, null);
+		database.delete(ClassSQLiteHelper.TABLE_NAME, ClassSQLiteHelper.COLUMN_CLASS_NAME + " = " + name, null);
 	}
 }
