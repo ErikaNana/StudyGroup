@@ -216,7 +216,7 @@ public class GetClasses extends Activity {
 			switch(which) {
 				case CONNECT_CURRENT_SEMESTER:
 					
-					String link = getCurrentSemesterLink(response);
+					String link = ClassInfoUtils.getCurrentSemesterLink(response);
 		        	link = BASE_URL + link;
 		        	
 		        	//connect to the pages with departments
@@ -225,7 +225,7 @@ public class GetClasses extends Activity {
 		    		
 					break;
 				case CONNECT_DEPARTMENTS:
-					getDepartmentLinks(response);
+					classUrls = ClassInfoUtils.getDepartmentLinks(response, classInfo, classUrls);
 					
 					//go to individual department pages and get time
 					Set<String> classes = classUrls.keySet();
@@ -364,7 +364,7 @@ public class GetClasses extends Activity {
 			
 			Document doc = Jsoup.parse(response);
 			Elements rows = doc.select("tr");
-			ArrayList<Element> rowsArray = convertToArray(rows);
+			ArrayList<Element> rowsArray = ClassInfoUtils.convertToArray(rows);
 			
 			//trim the fat off the arrays
 			rowsArray.remove(0);
@@ -379,7 +379,7 @@ public class GetClasses extends Activity {
 				Elements columns = row.select("td");
 				
 				//convert the columns to array for easier trimming
-				ArrayList<Element> columnsArray = convertToArray(columns);
+				ArrayList<Element> columnsArray = ClassInfoUtils.convertToArray(columns);
 				int size = columnsArray.size();
 				System.out.println("size of columns:  " + size);
 				if (size == 30) { //for some reason this is needed
@@ -415,7 +415,7 @@ public class GetClasses extends Activity {
 					course = new Course(className);
 				}
 				//this also handles multiple days
-				course = addToClass(columnsArray,course);
+				course = ClassInfoUtils.addToClass(columnsArray,course);
 				if (crns.contains(crn)) {
 					course.addCRN(crn);
 					courses.put(className,course);
@@ -426,69 +426,8 @@ public class GetClasses extends Activity {
 			// show an error dialog
 			e.printStackTrace();
 		}
-	}
-	//gets crnAndDeptInfo and classUrls
-	public void getDepartmentLinks(String response) {		
-		Document doc = Jsoup.parse(response);
-		Elements links = doc.getElementsByTag("a");
-		
-		for (Element link: links) {
-			String url = link.attr("href");
-			if (url.contains("&") && !(url.contains("frames"))) {
-				
-				//remove the first dot
-				url = url.replaceFirst(".", "");
-				Set<String> keys = classInfo.keySet();
-
-				//get urls for depts, and map crns to depts
-				for (String key : keys) {
-					String[] data = classInfo.get(key);
-					String dept = data[SEARCH_NAME];
-					if (url.contains("=" + dept)) {
-						//get the urls to search
-						if (!classUrls.containsKey(key)) {
-							classUrls.put(dept, url);
-						}
-					}
-				}
-			}
-		}
-	}
-	public static ArrayList<Element> convertToArray(Elements elements) {
-		ArrayList<Element> elementsArray = new ArrayList<Element>();
-		for (Element element: elements) {
-			//get rid of nbsp
-			if (!element.text().equals("\u00a0")) {
-				elementsArray.add(element);
-			}
-		}
-		return elementsArray;
-	}
-		
-	public static Course addToClass(ArrayList<Element> array, Course course) {
-		int arrayLength = array.size();
-		String classTime = array.get(arrayLength - 3).text();
-		String days = array.get(arrayLength - 4).text();
-		course.addDay(days);
-		course.addTime(classTime);
-		return course;
-	}
+	}		
 	
-	public String getCurrentSemesterLink(String response) {
-		Document doc = Jsoup.parse(response);
-		Elements links = doc.getElementsByTag("a");
-		Element link = links.get(6);
-		
-		//check if it is summer
-		if (link.text().contains("Summer")) {
-			link = links.get(7);
-		}
-		String url = link.attr("HREF");
-		
-		//remove the dot
-		url = url.replaceFirst(".", "");
-		return url;
-	}
 	//get the classAndCRN
 	public void getClassAndCRN(String response) {
 		Document doc = Jsoup.parse(response);
