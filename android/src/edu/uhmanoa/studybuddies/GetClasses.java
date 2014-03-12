@@ -43,6 +43,15 @@ public class GetClasses extends Activity {
 	public static final int CONNECT_CURRENT_SEMESTER = 3;
 	public static final int CONNECT_DEPARTMENTS = 4;
 	public static final int GET_TIME_FROM_DEPARTMENT = 5;
+	public static final int GET_MAIN_CLASS_PAGE = 6;
+	public static final int GET_MAIL_TOOL = 7;
+	public static final int GET_ROLES_SECTIONS_GROUPS = 8;
+	public static final int GET_JUST_ROLES = 9;
+	public static final int GET_STUDENTS = 10;
+	
+	//for dialogs
+	public static final int GET_CLASS_INFO = 11;
+	public static final int GET_ROSTERS = 12;
 	
 	//get class availability
 	String BASE_URL = "https://www.sis.hawaii.edu/uhdad";
@@ -111,7 +120,7 @@ public class GetClasses extends Activity {
 		mCookieValue = thisIntent.getStringExtra(Authenticate.COOKIE_TYPE);
 
 		//get classInfo
-		createDialog();
+		createDialog(GET_CLASS_INFO);
 		mLoginResponse = thisIntent.getStringExtra(Authenticate.LOGIN_RESPONSE);
 		getClassAndCRN(mLoginResponse);
 		
@@ -182,6 +191,14 @@ public class GetClasses extends Activity {
 						.execute();
 				resDoc = res.parse();
 				response = resDoc.toString();
+				
+				switch(which) {
+					
+				}
+				//get the cookie from previous authentication and hit each url in classInfo 
+				//get the rosters
+				//update classinfo hashmap
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -230,6 +247,8 @@ public class GetClasses extends Activity {
 						displayClasses();
 						counter = 0;
 						pd.dismiss();
+						getRosters();
+						pd.dismiss();
 					}
 					break;
 			}
@@ -238,11 +257,23 @@ public class GetClasses extends Activity {
 	private void launchGetDescription(Course mCourseLookingAt) {
 		Toast.makeText(getBaseContext(), mCourseLookingAt.toString(), Toast.LENGTH_SHORT).show();
 		
-	}	
-	public void createDialog() {
+	}
+	public void getRosters() {
+		createDialog(GET_ROSTERS);
+		//get the next relevant url from the response and keep going until you get the students
+	}
+	public void createDialog(int type) {
 		pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
-		pd.setTitle("Gathering your class data..."); //make this a random fact later haha
-		pd.setMessage("This might take a while");
+		switch(type) {
+			case GET_CLASS_INFO:
+				pd.setTitle("Gathering your class data..."); //make this a random fact later haha
+				pd.setMessage("This might take a while");
+				break;
+			case GET_ROSTERS:
+				pd.setTitle("Getting potential group members...");
+				pd.setMessage("I promise this is the last one!");
+				break;
+		}
 		pd.setIndeterminate(true);
 		pd.show();
 	}
