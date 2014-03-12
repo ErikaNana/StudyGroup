@@ -255,10 +255,8 @@ public class GetClasses extends Activity {
 						getRosters();
 					}
 					break;
-/*					public static final int GET_ROLES_SECTIONS_GROUPS = 8;
-					public static final int GET_JUST_ROLES = 9;
-					public static final int GET_STUDENTS = 10*/
-				case GET_MAIN_CLASS_PAGE:
+				//the following is basically a chain to get to the page with student names
+				case GET_MAIN_CLASS_PAGE: 
 					Log.w("GET_MAIN", "main");
 					String mailURL = RosterUtils.getMailToolURL(response);
 					Connect getRolesSectionGroupsPage = new Connect(GET_ROLES_SECTIONS_GROUPS, GET_ROSTERS);
@@ -287,7 +285,7 @@ public class GetClasses extends Activity {
 					break;
 					
 				case GET_STUDENTS:
-					Log.w("response", response);
+					updateWithRosters(response);
 					pd.dismiss();
 					//get list of students
 					//pass that to formatRosters
@@ -299,8 +297,11 @@ public class GetClasses extends Activity {
 		
 	}
 	//this method gets classmate objects and puts them in the database
-	public void updateWithRosters() {
-		
+	public void updateWithRosters(String response) {
+		ArrayList<Classmate> students = RosterUtils.getClassmates(response);
+		for (Classmate student: students) {
+			Log.w("students", student.toString());
+		}
 	}
 	public void getRosters() {
 		createDialog(GET_ROSTERS);

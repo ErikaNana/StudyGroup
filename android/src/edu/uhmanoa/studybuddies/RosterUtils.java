@@ -1,5 +1,7 @@
 package edu.uhmanoa.studybuddies;
 
+import java.util.ArrayList;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -57,5 +59,20 @@ public class RosterUtils {
 	}
 	
 	//returns a list of Classmate objects
-/*	public static ArrayList<>*/
+	public static ArrayList<Classmate> getClassmates(String response){
+		ArrayList<Classmate> classmates = new ArrayList<Classmate>();
+		Document doc = Jsoup.parse(response);
+		Elements rows = doc.getElementsByTag("label");
+		
+		for (Element row: rows) {
+			String rawName = row.text();
+			String[] elements = rawName.split("\\s");
+			
+			String name = elements[1] + " " + elements[0].replace(",", " ");
+			String email = elements[2].replace("(", "").replace(")", "");
+			Classmate classmate = new Classmate(name, email);
+			classmates.add(classmate);
+		}
+		return classmates;
+	}
 }
