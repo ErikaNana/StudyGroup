@@ -36,6 +36,10 @@
             android:name="edu.uhmanoa.studybuddies.GetClasses"
             android:label="@string/title_activity_get_classes" >
         </activity>
+        <activity
+            android:name="edu.uhmanoa.studybuddies.Classmates"
+            android:label="@string/title_activity_classmates" >
+        </activity>
     </application>
 
 </manifest>

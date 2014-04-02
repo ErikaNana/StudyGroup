@@ -8,53 +8,54 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.OnItemClickListener;
 
-public class Home extends Activity {
-	TextView mNumberOfClasses;
-	ListView mListOfClassesListView;
-	ArrayList<Course> mListOfClasses;
-	CourseAdapter mAdapter;
+public class Classmates extends Activity {
+	ListView mListOfClassmatesListView;
+	ArrayList<Classmate> mListOfClassmates;
+	ClassmateAdapter mAdapter;
+	TextView mNumberOfStudents;
 	
+	//databases
+	private ClassmatesDataSource classmatesDb;
+		
 	//for the scroll view listener
 	int mCurrentVisibleItemCount;
 	int mCurrentScrollState;
 	int mTotalItemCount;
 	int mCurrentFirstVisibleItem;
 	int mNumberOfItemsFit;
-	Course mCourseLookingAt;
+	Classmate mStudentLookingAt;
 	
-	//databases
-	private CoursesDataSource coursesDb;
-		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.home);
+		setContentView(R.layout.activity_classmates);
+		
+		Intent thisIntent = this.getIntent();
+		String courseName = thisIntent.getStringExtra("courseName");
+		
 		//databases
-		coursesDb = new CoursesDataSource(this);
-		coursesDb.open();
+		classmatesDb = new ClassmatesDataSource(this);
+		classmatesDb.open();
 		
 		//views
-		mNumberOfClasses = (TextView) findViewById(R.id.numberOfClassesHome);
-		mListOfClassesListView = (ListView) findViewById(R.id.listOfClassesHome);
-		mListOfClasses = new ArrayList<Course>();
+		mNumberOfStudents = (TextView) findViewById(R.id.studentsToChooseFrom);
+		mListOfClassmatesListView = (ListView) findViewById(R.id.listOfStudents);
+		mListOfClassmates = new ArrayList<Classmate>();
 		
 		//set up the listView
-		mListOfClasses = coursesDb.getAllCourses();
-		mAdapter = new CourseAdapter(this, R.id.listOfClassesHome, mListOfClasses);
-		mListOfClassesListView.setAdapter(mAdapter);
-		//update the view
-		if (mAdapter != null) {
-			mAdapter.notifyDataSetChanged();
-		}
+		mListOfClassmates = classmatesDb.getClassmates(courseName);
+		mAdapter = new ClassmateAdapter(this, R.id.listOfStudents, mListOfClassmates);
+		mListOfClassmatesListView.setAdapter(mAdapter);
+		
 		//set a scroll listener
-		mListOfClassesListView.setOnScrollListener(new OnScrollListener() {
+		mListOfClassmatesListView.setOnScrollListener(new OnScrollListener() {
 			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -80,31 +81,23 @@ public class Home extends Activity {
 			}
 		});
 		//listen for a click
-		mListOfClassesListView.setOnItemClickListener(new OnItemClickListener() {
+		mListOfClassmatesListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
-				mCourseLookingAt = (Course) mListOfClassesListView.getItemAtPosition(position);
+				Toast.makeText(getApplicationContext(), "what", Toast.LENGTH_SHORT).show();
+				//mStudentLookingAt = (Classmate) mListOfClassmatesListView.getItemAtPosition(position);
 				//change this for later take them to activity with their classmates listed in a listView
-				launchStudentsView(mCourseLookingAt.getName());
 			}	
 		});
-		
-		//Set the text for number of classes found
-		mNumberOfClasses.setText("Click a class to get started");
+		mNumberOfStudents.setText(mListOfClassmates.size() + " students to choose from");
 	}
 
-	public void launchStudentsView(String name) {
-		Intent launchGetClassmates = new Intent(this,Classmates.class);
-        //pass on the courseName
-        launchGetClassmates.putExtra("courseName", name);
-		startActivity(launchGetClassmates);
-	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.home, menu);
+		getMenuInflater().inflate(R.menu.classmates, menu);
 		return true;
 	}
 

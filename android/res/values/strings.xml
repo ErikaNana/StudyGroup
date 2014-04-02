@@ -15,5 +15,7 @@
     <string name="loginButtonText">Login</string>
     <string name="title_activity_get_classes">GetClasses</string>
     <string name="getRoster">Get Rosters</string>
+    <string name="title_activity_classmates">Classmates</string>
+    <string name="classmates_instructions">Choose students for your group</string>
 
 </resources>

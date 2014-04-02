@@ -6,13 +6,13 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".Home" >
+    tools:context=".Classmates" >
     <RelativeLayout 
         android:id="@+id/topLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
       <TextView 
-          android:id="@+id/numberOfClassesHome"
+          android:id="@+id/studentsToChooseFrom"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:textSize="22sp"
@@ -20,12 +20,12 @@
           android:textStyle="bold"
           android:layout_alignParentRight="true"
           android:layout_alignParentTop="true"
-          /> 
+          />
        <ListView 
-            android:id="@+id/listOfClassesHome"
+            android:id="@+id/listOfStudents"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/numberOfClassesHome">
+            android:layout_below="@+id/studentsToChooseFrom">
           </ListView>
     </RelativeLayout>
 </RelativeLayout>

@@ -171,6 +171,7 @@ public class GetClasses extends Activity {
 					long id) {
 				mCourseLookingAt = (Course) mListOfClassesListView.getItemAtPosition(position);
 				//change this for later take them to activity with their classmates listed in a listView
+				Log.w("launching Student", "launching student");
 				launchStudentsView(mCourseLookingAt);
 			}	
 		});
