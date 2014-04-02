@@ -5,15 +5,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class ClassSQLiteHelper extends SQLiteOpenHelper {
-	private static final String DATABASE_NAME = "classinfo.db";
-	public static final String TABLE_NAME = "classinfo";
+	private static final String DATABASE_NAME = "classesinfo.db";
+	public static final String TABLE_NAME = "classesinfo";
 /*	public static final String COLUMN_ID = "_id";*/
 	public static final String COLUMN_DAYS = "days";
 	public static final String COLUMN_TIMES = "times";
 	public static final String COLUMN_CLASS_NAME = "className";
 	
 	/*
-	 * 			   classinfo
+	 * 			 classinfo
 	 * -----------------------------
 	 * className |  days |  times  |
 	 * -----------------------------

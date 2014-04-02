@@ -10,6 +10,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 /*This class is responsible for storing and retrieving Course objects*/
+/*
+ * 			 classinfo
+ * -----------------------------
+ * className |  days |  times  |
+ * -----------------------------
+ */
 public class CoursesDataSource {
 
 	//Database fields
@@ -36,7 +42,6 @@ public class CoursesDataSource {
 	}
 	public void addCourse (Course course) {
 		ContentValues values = new ContentValues();
-		//figure out what to do with column_id? Or maybe you don't need it
 		values.put(ClassSQLiteHelper.COLUMN_CLASS_NAME, course.getName());
 		values.put(ClassSQLiteHelper.COLUMN_DAYS, course.getStringOfDays());
 		values.put(ClassSQLiteHelper.COLUMN_TIMES, course.getStringOfTimes());
@@ -63,14 +68,9 @@ public class CoursesDataSource {
 		return courses;
 	}
 	
-	//maybe change this so can get course by name? (names are unique anyway, so maybe don't need autoincrement thing
 	public Course getCourse(String name) {
-		//see if this is the right thing to call
 		SQLiteDatabase db = helper.getReadableDatabase();
-		String selectQuery = "SELECT * FROM " + ClassSQLiteHelper.TABLE_NAME + "WHERE " + ClassSQLiteHelper.COLUMN_CLASS_NAME + " = " + name;
-		Log.w("CoursesDataSource", selectQuery);
-		
-		Cursor c = db.rawQuery(selectQuery, null);
+		Cursor c = db.rawQuery("SELECT * FROM " + ClassSQLiteHelper.TABLE_NAME +  " WHERE " + ClassSQLiteHelper.COLUMN_CLASS_NAME + " = ?", new String[] {name});
 		
 		if (c != null) {
 			c.moveToFirst(); //cursor should only return one thing anyway
@@ -96,7 +96,7 @@ public class CoursesDataSource {
 	}
 	
 	public void deleteCourse(Course course) {
-		String name = course.getName();
+		String name = course.getName().replace(" ", "_");
 		database.delete(ClassSQLiteHelper.TABLE_NAME, ClassSQLiteHelper.COLUMN_CLASS_NAME + " = " + name, null);
 	}
 }

@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+// do try catches with these in activity method later on
 public class ClassInfoUtils {
 	public static String getCurrentSemesterLink(String response) {
 		Document doc = Jsoup.parse(response);

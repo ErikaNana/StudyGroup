@@ -60,7 +60,7 @@ public class RosterUtils {
 	
 	//returns a list of Classmate objects
 	//need to account for two first names ex. Jin Hao
-	public static ArrayList<Classmate> getClassmates(String response){
+	public static ArrayList<Classmate> getClassmates(String response, String classForRoster){
 		ArrayList<Classmate> classmates = new ArrayList<Classmate>();
 		Document doc = Jsoup.parse(response);
 		Elements rows = doc.getElementsByTag("label");
@@ -73,7 +73,7 @@ public class RosterUtils {
 			String[] splitFirstAndEmail = firstAndEmail.split("\\(");
 			String firstName = splitFirstAndEmail[0].trim();
 			String email = splitFirstAndEmail[1].replace(")", "");
-			Classmate classmate = new Classmate(firstName + " " + lastName, email);
+			Classmate classmate = new Classmate(firstName + " " + lastName, email, classForRoster);
 			classmates.add(classmate);}
 		return classmates;
 	}
