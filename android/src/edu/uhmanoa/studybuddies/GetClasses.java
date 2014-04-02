@@ -109,7 +109,8 @@ public class GetClasses extends Activity {
 		classRosterMap = new HashMap<String, ArrayList<Classmate>>();
 		//databases
 		coursesDb = new CoursesDataSource(this);
-
+		coursesDb.open();
+		
 		//delete any existing info
 		coursesDb.deleteAll();
 		
@@ -170,7 +171,7 @@ public class GetClasses extends Activity {
 					long id) {
 				mCourseLookingAt = (Course) mListOfClassesListView.getItemAtPosition(position);
 				//change this for later take them to activity with their classmates listed in a listView
-				launchGetDescription(mCourseLookingAt);
+				launchStudentsView(mCourseLookingAt);
 			}	
 		});
 	}
@@ -292,7 +293,6 @@ public class GetClasses extends Activity {
 					
 				case GET_STUDENTS:
 					updateWithRosters(response);
-					pd.dismiss();
 					Log.w("Dismiss", "DISMISS DIALOG");
 					//get list of students
 					//pass that to formatRosters
@@ -302,10 +302,19 @@ public class GetClasses extends Activity {
 					}*/
 					//THIS IS THE END OF GETTING OF ALL ROSTERS
 					addClassmates();
+					pd.dismiss();
+					//set the preference variable
+					//launch home screen and show the click a class to get started view
+					launchHome();
+					
 			}
         }
     }
-	private void launchGetDescription(Course mCourseLookingAt) {
+	public void launchHome() {
+		Intent launchHome = new Intent(this, Home.class);
+		startActivity(launchHome);
+	}
+	private void launchStudentsView(Course mCourseLookingAt) {
 		/*Course course = coursesDb.getCourse(mCourseLookingAt.getName());
 		Toast.makeText(getBaseContext(), course.getName(), Toast.LENGTH_SHORT).show();*/
 		
@@ -314,7 +323,7 @@ public class GetClasses extends Activity {
 		for (Classmate student: students) {
 			Log.w("students", student.toString());
 		}
-		//classmatesDb.close();
+		classmatesDb.close();
 	}
 	public void addClassmates() {
 		//put classmates in the database
