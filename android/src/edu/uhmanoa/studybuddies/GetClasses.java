@@ -287,7 +287,6 @@ public class GetClasses extends Activity {
 				case GET_ROLES_SECTIONS_GROUPS:
 					//Log.w("GET_sections", "sections");
 					String getRolesSectionGroupsPageURL = RosterUtils.getRolesSectionGroupsPage(response);
-					Log.w("check2", "class:  " + RosterUtils.getCurrentClass());
 					Connect getRoles = new Connect(GET_JUST_ROLES, GET_ROSTERS);
 					getRoles.execute(new String [] {getRolesSectionGroupsPageURL});
 					break;
@@ -295,7 +294,6 @@ public class GetClasses extends Activity {
 				case GET_JUST_ROLES:
 					//Log.w("GET_Roles", "roles");
 					String getStudentRoleURL = RosterUtils.getStudentRole(response);
-					Log.w("check3", "class:  " + RosterUtils.getCurrentClass());
 					Connect getStudentRole = new Connect(GET_STUDENTS_PAGE, GET_ROSTERS);
 					getStudentRole.execute(new String [] {getStudentRoleURL});
 					break;
@@ -303,13 +301,11 @@ public class GetClasses extends Activity {
 				case GET_STUDENTS_PAGE:
 					//Log.w("GET_student page", "student page");
 					String getStudentsURL = RosterUtils.getStudentsPage(response);
-					Log.w("check4", "class:  " + RosterUtils.getCurrentClass());
 					Connect getStudentsPage = new Connect(GET_STUDENTS, GET_ROSTERS);
 					getStudentsPage.execute(new String [] {getStudentsURL});
 					break;
 					
 				case GET_STUDENTS:
-					Log.w("check5", "class:  " + RosterUtils.getCurrentClass());
 					updateWithRosters(response);;
 					Log.w("Dismiss", "DISMISS DIALOG");
 					//THIS IS THE END OF GETTING OF ALL ROSTERS
@@ -345,20 +341,11 @@ public class GetClasses extends Activity {
 		Log.w("HERE", "Adding Classmates");
 		for (Classmate classmate: classmates) {
 			//order of check corresponds to what number they're on
-			Log.w("index", "index:  " + courseOrder.get(gotStudent-1));
 			String className = courseOrder.get(gotStudent-1);
 			Log.w("className", "className:  " + className);
 			classmatesDb.addClassmate(classmate, className);
 			Log.w("Adding", "adding:  " + classmate.name);
 		}
-		//go through the map and put them in
-/*		for (String currentClass: classRosterMap.keySet()) {
-			ArrayList<Classmate> classmates = classRosterMap.get(currentClass);
-			for (Classmate classmate: classmates) {
-				classmatesDb.addClassmate(classmate);
-				Log.w("Adding", "adding:  " + classmate.name);
-			}
-		}*/
 	}
 	//this method gets classmate objects and puts them in the database
 	//this is run in post execute, need to check the response before then
@@ -385,15 +372,6 @@ public class GetClasses extends Activity {
 	//update this to do get rosters for all classes
 	public void getRosters() {
 		createDialog(GET_ROSTERS);
-/*		for (String className: classInfo.keySet()) {
-			String[] classData = classInfo.get(className);
-			String url = classData[URL];
-			classForRoster = className;
-			Connect overallPage = new Connect(GET_MAIN_CLASS_PAGE, GET_ROSTERS);
-			overallPage.execute(new String [] {url});
-		}*/
-		//just get the first one for now
-		//getRosterForClass("ICS 491");
 		for (String className:  classInfo.keySet()) {
 			Log.w("classGetter", "getting for class:  " + className);
 			getRosterForClass(className);
