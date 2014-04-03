@@ -40,11 +40,11 @@ public class ClassmatesDataSource {
 		database.delete(ClassmateSQLiteHelper.TABLE_NAME, null, null);
 	}
 	
-	public void addClassmate(Classmate classmate) {
+	public void addClassmate(Classmate classmate, String className) {
 		ContentValues values = new ContentValues();
 		values.put(ClassmateSQLiteHelper.COLUMN_EMAIL, classmate.getEmail());
 		values.put(ClassmateSQLiteHelper.COLUMN_NAME, classmate.getName());
-		values.put(ClassmateSQLiteHelper.COLUMN_CLASS_NAME, classmate.getClassName());
+		values.put(ClassmateSQLiteHelper.COLUMN_CLASS_NAME, className);
 		values.put(ClassmateSQLiteHelper.COLUMN_GROUP_MEMBERSHIP, 0); //default to not in group
 		
 		database.insert(ClassmateSQLiteHelper.TABLE_NAME, null, values);

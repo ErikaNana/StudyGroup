@@ -16,7 +16,9 @@ import org.jsoup.select.Elements;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -96,8 +98,12 @@ public class GetClasses extends Activity {
 	private ClassmatesDataSource classmatesDb;
 	
 	//for determining where rosters belong to
-	String classForRoster = "";
 	HashMap<String, ArrayList<Classmate>> classRosterMap;
+	
+	//make sure that all student rosters were got
+	private int gotStudent = 0;
+	//keep track of the order of retrieved rosters
+	private ArrayList<String> courseOrder;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,13 +112,18 @@ public class GetClasses extends Activity {
 		classUrls = new HashMap<String, String>();
 		courses = new HashMap<String,Course>();
 		crns = new ArrayList<String>();
+		courseOrder = new ArrayList<String>();
 		classRosterMap = new HashMap<String, ArrayList<Classmate>>();
 		//databases
 		coursesDb = new CoursesDataSource(this);
+		classmatesDb = new ClassmatesDataSource(this);
+		
 		coursesDb.open();
+		classmatesDb.open();
 		
 		//delete any existing info
 		coursesDb.deleteAll();
+		classmatesDb.deleteAll();
 		
 		//views
 		setContentView(R.layout.get_classes);
@@ -191,7 +202,7 @@ public class GetClasses extends Activity {
 		protected String doInBackground(String... urls) {
 			Document resDoc = null;
 			String response = "";
-			
+
 			try {
 				//get the cookie from previous authentication and hit each url in classInfo 
 				//get the rosters
@@ -202,7 +213,7 @@ public class GetClasses extends Activity {
 							.method(Method.GET)
 							.execute();
 					resDoc = res.parse();
-					response = resDoc.toString();	
+					response = resDoc.toString();
 				}
 				else { 
 					resDoc = Jsoup.connect(urls[0])
@@ -216,7 +227,6 @@ public class GetClasses extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 			return response;
 		}
         @Override
@@ -267,13 +277,17 @@ public class GetClasses extends Activity {
 				case GET_MAIN_CLASS_PAGE: 
 					//Log.w("GET_MAIN", "main");
 					String mailURL = RosterUtils.getMailToolURL(response);
+					Log.w("check1", "class:  " + RosterUtils.getCurrentClass());
+					courseOrder.add(RosterUtils.getCurrentClass());
 					Connect getRolesSectionGroupsPage = new Connect(GET_ROLES_SECTIONS_GROUPS, GET_ROSTERS);
 					getRolesSectionGroupsPage.execute(new String [] {mailURL});
+					
 					break;
 				
 				case GET_ROLES_SECTIONS_GROUPS:
 					//Log.w("GET_sections", "sections");
 					String getRolesSectionGroupsPageURL = RosterUtils.getRolesSectionGroupsPage(response);
+					Log.w("check2", "class:  " + RosterUtils.getCurrentClass());
 					Connect getRoles = new Connect(GET_JUST_ROLES, GET_ROSTERS);
 					getRoles.execute(new String [] {getRolesSectionGroupsPageURL});
 					break;
@@ -281,6 +295,7 @@ public class GetClasses extends Activity {
 				case GET_JUST_ROLES:
 					//Log.w("GET_Roles", "roles");
 					String getStudentRoleURL = RosterUtils.getStudentRole(response);
+					Log.w("check3", "class:  " + RosterUtils.getCurrentClass());
 					Connect getStudentRole = new Connect(GET_STUDENTS_PAGE, GET_ROSTERS);
 					getStudentRole.execute(new String [] {getStudentRoleURL});
 					break;
@@ -288,31 +303,31 @@ public class GetClasses extends Activity {
 				case GET_STUDENTS_PAGE:
 					//Log.w("GET_student page", "student page");
 					String getStudentsURL = RosterUtils.getStudentsPage(response);
+					Log.w("check4", "class:  " + RosterUtils.getCurrentClass());
 					Connect getStudentsPage = new Connect(GET_STUDENTS, GET_ROSTERS);
 					getStudentsPage.execute(new String [] {getStudentsURL});
 					break;
 					
 				case GET_STUDENTS:
-					updateWithRosters(response);
+					Log.w("check5", "class:  " + RosterUtils.getCurrentClass());
+					updateWithRosters(response);;
 					Log.w("Dismiss", "DISMISS DIALOG");
-					//get list of students
-					//pass that to formatRosters
-					//check if we're done
-/*					if (classRosterMap.keySet().size() == courses.keySet().size()) {
-						Log.w("donezo","WE'RE ALL DONE");
-					}*/
 					//THIS IS THE END OF GETTING OF ALL ROSTERS
-					addClassmates();
-					pd.dismiss();
-					//set the preference variable
-					//launch home screen and show the click a class to get started view
-					launchHome();
-					
+					Log.w("GET_STUDENTS", "got student count"  + gotStudent);
+					if (gotStudent == courses.keySet().size()) {
+						pd.dismiss();
+						classmatesDb.close();
+						//launch home screen and show the click a class to get started view
+						launchHome();					
+					}
 			}
         }
     }
 	public void launchHome() {
 		Intent launchHome = new Intent(this, Home.class);
+		//set the preference variable
+		SharedPreferences prefs = this.getSharedPreferences(Initial.FIRST_USE, Context.MODE_PRIVATE);
+		prefs.edit().putBoolean(Initial.FIRST_USE, true).apply();
 		startActivity(launchHome);
 	}
 	private void launchStudentsView(Course mCourseLookingAt) {
@@ -326,31 +341,45 @@ public class GetClasses extends Activity {
 		}
 		classmatesDb.close();
 	}
-	public void addClassmates() {
-		//put classmates in the database
-		classmatesDb = new ClassmatesDataSource(this);
-		//delete any existing info
-		classmatesDb.deleteAll();
-		
-		classmatesDb.open();
-		
-		Log.w("HERE", "HERE");
+	public void addClassmates(ArrayList<Classmate> classmates) {		
+		Log.w("HERE", "Adding Classmates");
+		for (Classmate classmate: classmates) {
+			//order of check corresponds to what number they're on
+			Log.w("index", "index:  " + courseOrder.get(gotStudent-1));
+			String className = courseOrder.get(gotStudent-1);
+			Log.w("className", "className:  " + className);
+			classmatesDb.addClassmate(classmate, className);
+			Log.w("Adding", "adding:  " + classmate.name);
+		}
 		//go through the map and put them in
-		for (String currentClass: classRosterMap.keySet()) {
+/*		for (String currentClass: classRosterMap.keySet()) {
 			ArrayList<Classmate> classmates = classRosterMap.get(currentClass);
 			for (Classmate classmate: classmates) {
 				classmatesDb.addClassmate(classmate);
-	/*			Log.w("Adding", "adding:  " + classmate.name);*/
+				Log.w("Adding", "adding:  " + classmate.name);
 			}
-		}
+		}*/
 	}
 	//this method gets classmate objects and puts them in the database
+	//this is run in post execute, need to check the response before then
 	public void updateWithRosters(String response) {
-		ArrayList<Classmate> students = RosterUtils.getClassmates(response, classForRoster);
+		ArrayList<Classmate> students = RosterUtils.getClassmates(response);
 		//this is where the end will be after getting all of the rosters for all of the classes
 		//persist this in shared preferences or something just in case screen change or something
 		//do you really need this?
-		classRosterMap.put(classForRoster, students);
+		//This is actually being run in the background, so this needs to be handled differently, so do the size comparator in the post execute instead
+		if (students.size() == 0) {
+			Log.w("updateWithRosters", "There are no students");
+			//get the class again if there's no students
+			getRosterForClass(RosterUtils.getCurrentClass());
+		}
+		else {
+			gotStudent++;
+			Log.w("updateWithRosters", "Size of roster:  " + students.size());
+			Log.w("updateWithRosters", "Adding them to the hashmap");
+			addClassmates(students);
+			classRosterMap.put(courseOrder.get(gotStudent-1), students);
+		}
 	}
 	
 	//update this to do get rosters for all classes
@@ -364,13 +393,17 @@ public class GetClasses extends Activity {
 			overallPage.execute(new String [] {url});
 		}*/
 		//just get the first one for now
-		String[] testData = classInfo.get("ICS 491");
+		//getRosterForClass("ICS 491");
+		for (String className:  classInfo.keySet()) {
+			Log.w("classGetter", "getting for class:  " + className);
+			getRosterForClass(className);
+		}
+	}
+	public void getRosterForClass(String className) {
+		String[] testData = classInfo.get(className);
 		String url = testData[URL];
-		String className = "ICS 491";
-		classForRoster = className;
 		Connect overallPage = new Connect(GET_MAIN_CLASS_PAGE, GET_ROSTERS);
-		overallPage.execute(new String [] {url});
-		//get the next relevant url from the response and keep going until you get the students	
+		overallPage.execute(new String [] {url, className});
 	}
 	public void createDialog(int type) {
 		pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
