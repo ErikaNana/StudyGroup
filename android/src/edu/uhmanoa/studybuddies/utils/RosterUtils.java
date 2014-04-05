@@ -1,4 +1,4 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.utils;
 
 import java.util.ArrayList;
 
@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import edu.uhmanoa.studybuddies.db.Classmate;
 
 /*
  * This class is responsible for parsing responses 

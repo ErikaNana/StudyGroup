@@ -1,4 +1,4 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.db;
 
 import java.util.ArrayList;
 

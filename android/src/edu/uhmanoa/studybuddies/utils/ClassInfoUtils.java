@@ -1,4 +1,4 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import edu.uhmanoa.studybuddies.db.Course;
+import edu.uhmanoa.studybuddies.ui.GetClasses;
 
 // do try catches with these in activity method later on
 public class ClassInfoUtils {

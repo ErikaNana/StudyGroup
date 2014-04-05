@@ -1,4 +1,4 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.ui;
 
 import java.io.IOException;
 
@@ -7,6 +7,11 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import edu.uhmanoa.studybuddies.R;
+import edu.uhmanoa.studybuddies.R.id;
+import edu.uhmanoa.studybuddies.R.layout;
+import edu.uhmanoa.studybuddies.R.menu;
+import edu.uhmanoa.studybuddies.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;

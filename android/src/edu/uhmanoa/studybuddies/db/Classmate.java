@@ -1,9 +1,9 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.db;
 
 public class Classmate {
-	String name = "";
-	String email = "";
-	String className ="";
+	public String name = "";
+	public String email = "";
+	public String className ="";
 	boolean isClicked;
 	
 	public Classmate(String name, String email, String className) {

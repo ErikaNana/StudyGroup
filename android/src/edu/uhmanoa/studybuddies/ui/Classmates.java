@@ -1,7 +1,11 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.ui;
 
 import java.util.ArrayList;
 
+import edu.uhmanoa.studybuddies.R;
+import edu.uhmanoa.studybuddies.db.Classmate;
+import edu.uhmanoa.studybuddies.db.ClassmateAdapter;
+import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

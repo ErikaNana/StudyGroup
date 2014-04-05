@@ -1,7 +1,8 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.db;
 
 import java.util.ArrayList;
 
+import edu.uhmanoa.studybuddies.R;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;

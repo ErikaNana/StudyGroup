@@ -1,4 +1,4 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +14,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import edu.uhmanoa.studybuddies.R;
+import edu.uhmanoa.studybuddies.db.Classmate;
+import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
+import edu.uhmanoa.studybuddies.db.Course;
+import edu.uhmanoa.studybuddies.db.CourseAdapter;
+import edu.uhmanoa.studybuddies.db.CoursesDataSource;
+import edu.uhmanoa.studybuddies.utils.ClassInfoUtils;
+import edu.uhmanoa.studybuddies.utils.RosterUtils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;

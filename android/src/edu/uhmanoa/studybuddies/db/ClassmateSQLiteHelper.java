@@ -1,4 +1,4 @@
-package edu.uhmanoa.studybuddies;
+package edu.uhmanoa.studybuddies.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
