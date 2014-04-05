@@ -8,20 +8,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import edu.uhmanoa.studybuddies.ClassmateAdapter.ViewHolder;
 
-public class Classmates extends Activity {
+public class Classmates extends Activity{
 	ListView mListOfClassmatesListView;
 	ArrayList<Classmate> mListOfClassmates;
 	ClassmateAdapter mAdapter;
 	TextView mNumberOfStudents;
+	Button createGroup;
 	
 	//databases
 	private ClassmatesDataSource classmatesDb;
@@ -44,6 +45,8 @@ public class Classmates extends Activity {
 		
 		//initialize
 		clicked = new ArrayList<Classmate>();
+		createGroup = (Button) findViewById(R.id.createGroupWithClassmates);
+		
 		//databases
 		classmatesDb = new ClassmatesDataSource(this);
 		classmatesDb.open();
@@ -102,12 +105,25 @@ public class Classmates extends Activity {
 					view.setBackgroundResource(R.drawable.gradient_bg_hover);
 					student.setClicked(true);
 					mAdapter.notifyDataSetChanged();
-					Log.w("clicked",clicked.toString());
+					
 					
 				}
 			}	
 		});
 		mNumberOfStudents.setText(mListOfClassmates.size() + " students to choose from");
+		
+		//set up createGroups button
+		createGroup.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//just to be safe
+				if (v.getId() == createGroup.getId()) {
+					Log.w("clicked",clicked.toString());
+					//format and push data
+				}
+			}
+		});
 	}
 
 	@Override
@@ -116,5 +132,4 @@ public class Classmates extends Activity {
 		getMenuInflater().inflate(R.menu.classmates, menu);
 		return true;
 	}
-
 }
