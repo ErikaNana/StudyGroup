@@ -25,22 +25,23 @@
             </intent-filter>
         </activity>
         <activity
- edu.uhmanoa.studybuddies.ui.Authenticateoid:name="ui.Authenticate"
+            android:name="edu.uhmanoa.studybuddies.ui.Authenticate"
             android:label="@string/title_activity_authenticate" >
         </activity>
         <activity
- edu.uhmanoa.studybuddies.ui.CreateGrouproid:name="ui.CreateGroup"
+            android:name="edu.uhmanoa.studybuddies.ui.CreateGroup"
             android:label="@string/title_activity_home" >
         </activity>
         <activity
-            android:name="edu.uhmanoa.studybuddies.GetClasses"
+            android:name="edu.uhmanoa.studybuddies.ui.GetClasses"
             android:label="@string/title_activity_get_classes" >
         </activity>
         <activity
-            android:name="edu.uhmanoa.studybuddies.Classmates"
+            android:name="edu.uhmanoa.studybuddies.ui.Classmates"
             android:label="@string/title_activity_classmates" >
-        </activiedu.uhmanoa.studybuddies.ui.Home      <activity
-            android:name="ui.Home"
+        </activity>
+        <activity
+            android:name="edu.uhmanoa.studybuddies.ui.Home"
             android:label="@string/title_activity_home" >
         </activity>
     </application>

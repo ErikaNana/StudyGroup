@@ -8,10 +8,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import edu.uhmanoa.studybuddies.R;
-import edu.uhmanoa.studybuddies.R.id;
-import edu.uhmanoa.studybuddies.R.layout;
-import edu.uhmanoa.studybuddies.R.menu;
-import edu.uhmanoa.studybuddies.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -84,6 +80,10 @@ public class Authenticate extends Activity implements OnClickListener {
 		}
 	}
 	
+	public void finishActivity() {
+		finish();
+	}
+	
 	//establishing the connection
 	
 	private class connectToWebsite extends AsyncTask <String, Void, String>{
@@ -152,7 +152,7 @@ public class Authenticate extends Activity implements OnClickListener {
 		connectToWebsite connect = new connectToWebsite();
 		connect.execute(new String [] {LAULIMA_LOGIN});
 	}
-	
+
 	public void showErrorDialog(int typeOfError) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK).setTitle(R.string.app_name);
 		pd.dismiss();
@@ -181,6 +181,7 @@ public class Authenticate extends Activity implements OnClickListener {
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
 						startActivity(intent);
+						finishActivity();
 					}
 				});
 				builder.setNegativeButton("Try again", new DialogInterface.OnClickListener() {
@@ -200,3 +201,4 @@ public class Authenticate extends Activity implements OnClickListener {
 		dialog.show();
 	}
 }
+

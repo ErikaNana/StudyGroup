@@ -2,25 +2,21 @@ package edu.uhmanoa.studybuddies.ui;
 
 import java.util.ArrayList;
 
-import edu.uhmanoa.studybuddies.R;
-import edu.uhmanoa.studybuddies.R.id;
-import edu.uhmanoa.studybuddies.R.layout;
-import edu.uhmanoa.studybuddies.R.menu;
-import edu.uhmanoa.studybuddies.db.Course;
-import edu.uhmanoa.studybuddies.db.CourseAdapter;
-import edu.uhmanoa.studybuddies.db.CoursesDataSource;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.OnItemClickListener;
+import edu.uhmanoa.studybuddies.R;
+import edu.uhmanoa.studybuddies.db.Course;
+import edu.uhmanoa.studybuddies.db.CourseAdapter;
+import edu.uhmanoa.studybuddies.db.CoursesDataSource;
 
 public class CreateGroup extends Activity {
 	TextView mNumberOfClasses;

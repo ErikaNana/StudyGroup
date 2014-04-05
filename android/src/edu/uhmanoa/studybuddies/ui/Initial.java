@@ -1,9 +1,5 @@
 package edu.uhmanoa.studybuddies.ui;
 
-import edu.uhmanoa.studybuddies.R;
-import edu.uhmanoa.studybuddies.R.id;
-import edu.uhmanoa.studybuddies.R.layout;
-import edu.uhmanoa.studybuddies.R.menu;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.TextView;
+import edu.uhmanoa.studybuddies.R;
 
 public class Initial extends Activity {
 	
