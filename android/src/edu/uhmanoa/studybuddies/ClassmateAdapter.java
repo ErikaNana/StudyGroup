@@ -25,9 +25,10 @@ public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 	 * ViewHolder stores each of the component views inside the tag field of the layout,
 	 * so can immediately access them without the need to look them up repeatedly*/
 	public static class ViewHolder{
-		TextView studentName;
+		public  TextView studentName;
 	}
 	@Override
+	//this is what refreshes the views
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 		ViewHolder holder;
@@ -47,7 +48,15 @@ public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 		if (classmate != null) {
 			//set course title
 			holder.studentName.setText(classmate.getName());
+			//keep the ones that are selected, selected
+			if (classmate.isClicked()){
+				view.setBackgroundResource(R.drawable.gradient_bg_hover);
+			}
+			else {
+				view.setBackgroundResource(R.drawable.gradient_bg);
+			}
 		}
+
 		return view;
 	}
 

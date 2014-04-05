@@ -4,11 +4,14 @@ public class Classmate {
 	String name = "";
 	String email = "";
 	String className ="";
+	boolean isClicked;
 	
 	public Classmate(String name, String email, String className) {
 		this.name = name;
 		this.email = email;
 		this.className = className;
+		this.isClicked = false;
+		
 	}
 	
 	public String getEmail() {
@@ -30,5 +33,15 @@ public class Classmate {
 	public String getClassName() {
 		return className;
 	}
-	
+	public void setClicked(boolean click) {
+		if (click) {
+			isClicked = true;
+		}
+		else {
+			isClicked = false;
+		}
+	}
+	public boolean isClicked() {
+		return isClicked;
+	}
 }

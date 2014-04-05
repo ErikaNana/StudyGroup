@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AbsListView;
@@ -14,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.uhmanoa.studybuddies.ClassmateAdapter.ViewHolder;
 
 public class Classmates extends Activity {
 	ListView mListOfClassmatesListView;
@@ -31,7 +33,7 @@ public class Classmates extends Activity {
 	int mCurrentFirstVisibleItem;
 	int mNumberOfItemsFit;
 	Classmate mStudentLookingAt;
-	
+	ArrayList<Classmate> clicked;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,6 +42,8 @@ public class Classmates extends Activity {
 		Intent thisIntent = this.getIntent();
 		String courseName = thisIntent.getStringExtra("courseName");
 		
+		//initialize
+		clicked = new ArrayList<Classmate>();
 		//databases
 		classmatesDb = new ClassmatesDataSource(this);
 		classmatesDb.open();
@@ -82,13 +86,25 @@ public class Classmates extends Activity {
 		});
 		//listen for a click
 		mListOfClassmatesListView.setOnItemClickListener(new OnItemClickListener() {
-
+			
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
-				Toast.makeText(getApplicationContext(), "what", Toast.LENGTH_SHORT).show();
-				//mStudentLookingAt = (Classmate) mListOfClassmatesListView.getItemAtPosition(position);
-				//change this for later take them to activity with their classmates listed in a listView
+				Classmate student = (Classmate) parent.getAdapter().getItem(position);
+				if (clicked.contains(student)) {
+					clicked.remove(student);
+					student.setClicked(false);
+					//refresh the view to reflect changes
+					mAdapter.notifyDataSetChanged();
+				}
+				else {
+					clicked.add(student);
+					view.setBackgroundResource(R.drawable.gradient_bg_hover);
+					student.setClicked(true);
+					mAdapter.notifyDataSetChanged();
+					Log.w("clicked",clicked.toString());
+					
+				}
 			}	
 		});
 		mNumberOfStudents.setText(mListOfClassmates.size() + " students to choose from");
