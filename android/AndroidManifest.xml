@@ -29,7 +29,7 @@
             android:label="@string/title_activity_authenticate" >
         </activity>
         <activity
-            android:name="edu.uhmanoa.studybuddies.Home"
+            android:name="edu.uhmanoa.studybuddies.CreateGroup"
             android:label="@string/title_activity_home" >
         </activity>
         <activity
@@ -39,6 +39,10 @@
         <activity
             android:name="edu.uhmanoa.studybuddies.Classmates"
             android:label="@string/title_activity_classmates" >
+        </activity>
+        <activity
+            android:name="edu.uhmanoa.studybuddies.Home"
+            android:label="@string/title_activity_home" >
         </activity>
     </application>
 

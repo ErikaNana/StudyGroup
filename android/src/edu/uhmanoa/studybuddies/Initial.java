@@ -20,7 +20,7 @@ public class Initial extends Activity {
 		SharedPreferences prefs = this.getSharedPreferences(FIRST_USE, Context.MODE_PRIVATE);
 		
 		//for debugging
-		prefs.edit().putBoolean(Initial.FIRST_USE, true).apply();
+		//prefs.edit().putBoolean(Initial.FIRST_USE, true).apply();
 		//use a default value if there is none
 		boolean firstUse = prefs.getBoolean(FIRST_USE, true);
 		
@@ -29,12 +29,14 @@ public class Initial extends Activity {
 			authenticate.setText("I'm a first time user!");
 			Intent launchAuthenticate = new Intent(this,Authenticate.class);
 			startActivity(launchAuthenticate);
+			//don't want to be accessed by back button
+			finish();
 		}
 		else {
 			authenticate.setText("I've been here before");
 			Intent launchHome = new Intent(this, Home.class);
 			startActivity(launchHome);
-			
+			finish();
 		}
 	}
 

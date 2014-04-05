@@ -323,7 +323,7 @@ public class GetClasses extends Activity {
 		Intent launchHome = new Intent(this, Home.class);
 		//set the preference variable
 		SharedPreferences prefs = this.getSharedPreferences(Initial.FIRST_USE, Context.MODE_PRIVATE);
-		prefs.edit().putBoolean(Initial.FIRST_USE, true).apply();
+		prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
 		startActivity(launchHome);
 	}
 	private void launchStudentsView(Course mCourseLookingAt) {
