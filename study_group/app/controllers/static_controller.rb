@@ -8,6 +8,5 @@ class StaticController < ApplicationController
 
     def display_json
         #for now
-        render 'create'
     end
 end
