@@ -32,6 +32,8 @@ public class JsonUtils{
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.setPrettyPrinting();
 		Gson gson = gsonBuilder.create();
+		
+		//string formatted json
 		return gson.toJson(json);
 	}
 }
