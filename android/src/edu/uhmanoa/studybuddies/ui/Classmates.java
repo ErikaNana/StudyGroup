@@ -2,10 +2,6 @@ package edu.uhmanoa.studybuddies.ui;
 
 import java.util.ArrayList;
 
-import edu.uhmanoa.studybuddies.R;
-import edu.uhmanoa.studybuddies.db.Classmate;
-import edu.uhmanoa.studybuddies.db.ClassmateAdapter;
-import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +16,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+
+import edu.uhmanoa.studybuddies.R;
+import edu.uhmanoa.studybuddies.db.Classmate;
+import edu.uhmanoa.studybuddies.db.ClassmateAdapter;
+import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
+import edu.uhmanoa.studybuddies.utils.JsonUtils;
 
 public class Classmates extends Activity{
 	ListView mListOfClassmatesListView;
@@ -100,14 +104,14 @@ public class Classmates extends Activity{
 				Classmate student = (Classmate) parent.getAdapter().getItem(position);
 				if (clicked.contains(student)) {
 					clicked.remove(student);
-					student.setClicked(false);
+					student.setMembership(false);
 					//refresh the view to reflect changes
 					mAdapter.notifyDataSetChanged();
 				}
 				else {
 					clicked.add(student);
 					view.setBackgroundResource(R.drawable.gradient_bg_hover);
-					student.setClicked(true);
+					student.setMembership(true);
 					mAdapter.notifyDataSetChanged();
 					
 					
@@ -125,6 +129,8 @@ public class Classmates extends Activity{
 				if (v.getId() == createGroup.getId()) {
 					Log.w("clicked",clicked.toString());
 					//format and push data
+					String print = JsonUtils.getJson(clicked);
+					Log.w("json", print);
 				}
 			}
 		});

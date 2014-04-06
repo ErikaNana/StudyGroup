@@ -13,7 +13,7 @@ bin/
 gen/
 Docs/
 Presentations/
-
+external_libraries/
 # Gradle files
 .gradle/
 build/

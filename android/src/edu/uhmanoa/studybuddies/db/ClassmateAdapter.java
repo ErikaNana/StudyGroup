@@ -50,7 +50,7 @@ public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 			//set course title
 			holder.studentName.setText(classmate.getName());
 			//keep the ones that are selected, selected
-			if (classmate.isClicked()){
+			if (classmate.isMember()){
 				view.setBackgroundResource(R.drawable.gradient_bg_hover);
 			}
 			else {
