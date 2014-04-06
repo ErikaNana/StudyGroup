@@ -12,7 +12,7 @@ import edu.uhmanoa.studybuddies.db.Classmate;
 
 public class JsonUtils{
 	
-	public static String getJson(ArrayList<Classmate> classmates) {
+	public static String getJson(ArrayList<Classmate> classmates, String userName, String className) {
 		JsonObject json = new JsonObject(); //overall container
 		JsonArray jsonArray = new JsonArray(); //array of classmates
 		
@@ -27,8 +27,11 @@ public class JsonUtils{
 			//add to array
 			jsonArray.add(jsonClassmate);
 		}
-		json.addProperty("groupMembers", classmates.get(0).getClassName());
-		json.add("members", jsonArray);
+				
+		JsonObject jsonContainer = new JsonObject();
+		jsonContainer.addProperty("user", userName);
+		jsonContainer.add("members", jsonArray);
+		json.add("createGroup", jsonContainer);
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.setPrettyPrinting();
 		Gson gson = gsonBuilder.create();

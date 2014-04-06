@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -34,6 +35,9 @@ public class Authenticate extends Activity implements OnClickListener {
 	String mUserName;
 	String mPassword;
 	String mCookieValue;
+	
+	//username
+	public static final String USER_NAME = "userName";
 	
 	//urls;
 	public static final String LAULIMA_LOGIN = "https://laulima.hawaii.edu/portal/xlogin";
@@ -74,8 +78,9 @@ public class Authenticate extends Activity implements OnClickListener {
 
 /*			mUserName = mUserNameBox.getText().toString();
 			mPassword = mPasswordBox.getText().toString();*/
-			mUserName = "enana";
+/*			mUserName = "enana";*/
 			mPassword = "fUcktbs!1!";
+			mUserName = mUserNameBox.getText().toString();
 			login();
 		}
 	}
@@ -133,6 +138,11 @@ public class Authenticate extends Activity implements OnClickListener {
     }
 	
 	public void launchGetClasses() {
+		//store the user name in preferences for later reference
+        
+        SharedPreferences prefs = this.getSharedPreferences(USER_NAME, Context.MODE_PRIVATE);
+		prefs.edit().putString(USER_NAME, mUserName);
+		
         Intent launchGetClasses = new Intent(this,GetClasses.class);
         
         //pass on the cookie

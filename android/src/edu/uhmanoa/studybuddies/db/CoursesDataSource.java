@@ -96,7 +96,7 @@ public class CoursesDataSource {
 	}
 	
 	public void deleteCourse(Course course) {
-		String name = course.getName().replace(" ", "_");
+		String name = course.getName();
 		database.delete(ClassSQLiteHelper.TABLE_NAME, ClassSQLiteHelper.COLUMN_CLASS_NAME + " = " + name, null);
 	}
 }

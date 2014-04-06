@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -12,8 +14,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -53,19 +57,32 @@ public class Classmates extends Activity{
 	int mCurrentFirstVisibleItem;
 	int mNumberOfItemsFit;
 	Classmate mStudentLookingAt;
+	
+	//json params
 	ArrayList<Classmate> clicked;
+	String userName;
+	String courseName;
+	ProgressDialog pd;
+	
+	SharedPreferences prefs;
+	public static final String CREATED_GROUPS = "created";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.create_group);
 		
 		Intent thisIntent = this.getIntent();
-		String courseName = thisIntent.getStringExtra("courseName");
-		
+		courseName = thisIntent.getStringExtra("courseName");
+		Log.w("courseName", courseName);
+	
 		//initialize
 		clicked = new ArrayList<Classmate>();
 		createGroup = (Button) findViewById(R.id.createGroupWithClassmates);
 		
+		prefs = this.getSharedPreferences(Authenticate.USER_NAME, Context.MODE_PRIVATE);
+		userName = prefs.getString(Authenticate.USER_NAME, "nothing");
+		Log.w("userName", userName);
 		//databases
 		classmatesDb = new ClassmatesDataSource(this);
 		classmatesDb.open();
@@ -139,9 +156,11 @@ public class Classmates extends Activity{
 				//just to be safe
 				if (v.getId() == createGroup.getId()) {
 					Log.w("clicked",clicked.toString());
+					
 					//format and push data
-					String json = JsonUtils.getJson(clicked);
+					String json = JsonUtils.getJson(clicked, userName, courseName);
 					postParams(json);
+					showPostingDialog();
 					Log.w("json", json);
 				}
 			}
@@ -181,8 +200,6 @@ public class Classmates extends Activity{
 				
 				@Override
 				public void sendStartMessage() {
-					// TODO Auto-generated method stub
-					
 				}
 				
 				@Override
@@ -194,7 +211,8 @@ public class Classmates extends Activity{
 				@Override
 				public void sendResponseMessage(HttpResponse response) throws IOException {
 					HttpEntity entity = response.getEntity();
-					printThis(EntityUtils.toString(entity));
+					String responseString = EntityUtils.toString(entity);
+					printThis(responseString);
 				}
 				@Override
 				public void sendProgressMessage(int arg0, int arg1) {
@@ -204,8 +222,7 @@ public class Classmates extends Activity{
 				
 				@Override
 				public void sendFinishMessage() {
-					// TODO Auto-generated method stub
-					
+					updateGroups(courseName);
 				}
 				
 				@Override
@@ -234,6 +251,29 @@ public class Classmates extends Activity{
 	
 	public void printThis(String stuff) {
 		Log.w("finished", stuff);
+	}
+	
+	public void showPostingDialog() {
+		pd = new ProgressDialog(this, ProgressDialog.THEME_DEVICE_DEFAULT_DARK);
+		pd.setTitle("Creating your group...");
+		pd.setMessage("Random fact is random");
+		pd.show();
+	}
+	
+	public void updateGroups(String courseName) {
+		//update createGroups 
+		Set<String> createdGroups = prefs.getStringSet(CREATED_GROUPS, null);
+		if (createdGroups == null) {
+			ArrayList<String> group = new ArrayList<String>();
+			group.add(courseName);
+			Set<String> set = new HashSet<String>();
+			set.addAll(group);
+			prefs.edit().putStringSet(CREATED_GROUPS, set);
+		}
+		else {
+			//do something here later if deleting groups or adding more people or whatever
+		}
+		pd.dismiss();
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
