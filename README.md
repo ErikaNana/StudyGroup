@@ -7,16 +7,15 @@ The Heroku application can be found <a href = "http://study-group-creator.heroku
 First Milestone 
 ---------------
 * ~~Android app authenticates the user if they are using the app for the first time~~
-* Android app goes to myUH and gets the class names and class times of the user
-* Android app displays classes and times in a ListView
- * This information will be persisted 
-* Android app stores a boolean that reflects if a user is a new user or not
+* ~~Android app goes to myUH and gets the class names and class times of the user~~
+* ~~Android app displays classes and times in a ListView~~
+ * ~~This information will be persisted~~ 
+* ~~Android app stores a boolean that reflects if a user is a new user or not~~
 
 Second Milestone 
 ----------------
 * Write an API using JSON
-  * Android app sends how many people the user wants in their group, user name and password to the web app
-    * Web app gets name of people in the class from Laulima
+  * ~~Android app sends how many people the user wants in their group, user name and password to the web app~~
   * Web app sends notifications to people on the list
     * First checks to see if they are a StudyGroup user
       * If yes, send a study group invite to that application
