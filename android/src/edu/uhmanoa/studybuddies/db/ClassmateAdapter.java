@@ -2,14 +2,15 @@ package edu.uhmanoa.studybuddies.db;
 
 import java.util.ArrayList;
 
-import edu.uhmanoa.studybuddies.R;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import edu.uhmanoa.studybuddies.R;
 
 public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 	ArrayList<Classmate> mListOfClassmates;
@@ -50,10 +51,18 @@ public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 			//set course title
 			holder.studentName.setText(classmate.getName());
 			//keep the ones that are selected, selected
-			if (classmate.isMember()){
+			//pending as in pending group formation
+			if (classmate.isPendingCreation()){
 				view.setBackgroundResource(R.drawable.gradient_bg_hover);
 			}
 			else {
+				view.setBackgroundResource(R.drawable.gradient_bg);
+			}
+			
+			//if confirmed, change it and can't be clickable
+			if (classmate.isConfirmedCreation()) {
+				holder.studentName.setTextColor(Color.DKGRAY);
+				view.setEnabled(false);
 				view.setBackgroundResource(R.drawable.gradient_bg);
 			}
 		}

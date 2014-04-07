@@ -22,7 +22,7 @@ public class JsonUtils{
 			jsonClassmate.addProperty("name", classmate.name);
 			jsonClassmate.addProperty("className", classmate.className);
 			jsonClassmate.addProperty("email", classmate.email);
-			jsonClassmate.addProperty("isMember", classmate.isMember());
+			jsonClassmate.addProperty("isMember", classmate.isPendingCreation());
 			
 			//add to array
 			jsonArray.add(jsonClassmate);

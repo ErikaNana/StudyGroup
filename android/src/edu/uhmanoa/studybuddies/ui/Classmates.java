@@ -130,23 +130,24 @@ public class Classmates extends Activity{
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 				Classmate student = (Classmate) parent.getAdapter().getItem(position);
-				if (clicked.contains(student)) {
-					clicked.remove(student);
-					student.setMembership(false);
-					//refresh the view to reflect changes
-					mAdapter.notifyDataSetChanged();
-				}
-				else {
-					clicked.add(student);
-					view.setBackgroundResource(R.drawable.gradient_bg_hover);
-					student.setMembership(true);
-					mAdapter.notifyDataSetChanged();
-					
-					
+				if (!student.isConfirmedCreation()) {
+					if (clicked.contains(student)) {
+						clicked.remove(student);
+						student.setPendingCreation(false);
+						classmatesDb.updatePending(student, ClassmatesDataSource.NOT_PENDING_CREATION);
+						//refresh the view to reflect changes
+						mAdapter.notifyDataSetChanged();
+					}
+					else {
+						clicked.add(student);
+						view.setBackgroundResource(R.drawable.gradient_bg_hover);
+						student.setPendingCreation(true);
+						classmatesDb.updatePending(student, ClassmatesDataSource.PENDING_CREATION);
+						mAdapter.notifyDataSetChanged();	
+					}
 				}
 			}	
 		});
-		mNumberOfStudents.setText(mListOfClassmates.size() + " students to choose from");
 		
 		//set up createGroups button
 		createGroup.setOnClickListener(new OnClickListener() {
@@ -156,7 +157,13 @@ public class Classmates extends Activity{
 				//just to be safe
 				if (v.getId() == createGroup.getId()) {
 					Log.w("clicked",clicked.toString());
-					
+					//confirm students
+					for (Classmate classmate: clicked) {
+						classmate.setConfirmedCreation(true);
+						classmatesDb.updateConfirmed(classmate, ClassmatesDataSource.CONFIRMED_CREATION);
+						//refresh the view
+						mAdapter.notifyDataSetChanged();
+					}
 					//format and push data
 					String json = JsonUtils.getJson(clicked, userName, courseName);
 					postParams(json);
@@ -165,8 +172,26 @@ public class Classmates extends Activity{
 				}
 			}
 		});
+		
+		updateStudentCount();
+		
 	}
 	
+	public void updateStudentCount() {
+		//only show available students
+		int counter = 0;
+		for (Classmate classmate: mListOfClassmates) {
+			if (!classmate.isConfirmedCreation()) {
+				counter++;
+			}
+		}
+		String student = "student";
+		if (counter != 1) {
+			student = "students";
+		}
+		
+		mNumberOfStudents.setText(counter + " " + student + " to choose from");
+	}
 	public void postParams(String json) {
 		AsyncHttpClient client = new AsyncHttpClient();
 		String url = "http://study-group-creator.herokuapp.com/create";
@@ -273,7 +298,11 @@ public class Classmates extends Activity{
 		else {
 			//do something here later if deleting groups or adding more people or whatever
 		}
+		//update the view
+		
 		pd.dismiss();
+		
+		updateStudentCount();
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
