@@ -7,7 +7,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 /*This class is responsible for storing and retrieving Classmate objects*/
 /*
@@ -46,7 +45,6 @@ public class ClassmatesDataSource {
 	}
 	
 	public void addClassmate(Classmate classmate, String className) {
-		Log.w("adding classmates", "add classmates");
 		ContentValues values = new ContentValues();
 		values.put(ClassmateSQLiteHelper.COLUMN_EMAIL, classmate.getEmail());
 		values.put(ClassmateSQLiteHelper.COLUMN_NAME, classmate.getName());
@@ -78,7 +76,7 @@ public class ClassmatesDataSource {
 		//go to the row with that classmate
 		SQLiteDatabase db = helper.getReadableDatabase();
 		ContentValues values = new ContentValues();
-		Log.w("before update", "confirmed value:  " + classmate.isConfirmedCreation());
+
 		if (confirmed == CONFIRMED_CREATION) {
 			values.put(ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION, 1);
 		}
@@ -86,9 +84,6 @@ public class ClassmatesDataSource {
 			values.put(ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION, 0);
 		}
 		db.update(ClassmateSQLiteHelper.TABLE_NAME, values, ClassmateSQLiteHelper.COLUMN_EMAIL + " = ?", new String[] {classmate.email});
-		Log.w("update", "classmate:  " + classmate.name);
-		Log.w("update", "confirmed value:  " + classmate.isConfirmedCreation());
-		Log.w("update", "confirmed");
 	}
 	
 	//gets a classmate given an email
