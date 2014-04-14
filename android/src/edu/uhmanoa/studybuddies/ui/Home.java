@@ -86,7 +86,8 @@ public class Home extends Activity implements OnClickListener{
 				startActivity(launchCreateGroup);
 				break;
 			case R.id.viewGroups:
-				/*Intent launchCreateGroup = new Intent(this, Home.class);*/
+				Intent launchViewGroups = new Intent(this, ViewGroup.class);
+				startActivity(launchViewGroups);
 				break;
 		}
 	}

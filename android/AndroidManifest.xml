@@ -44,6 +44,14 @@
             android:name="edu.uhmanoa.studybuddies.ui.Home"
             android:label="@string/title_activity_home" >
         </activity>
+        <activity
+            android:name="edu.uhmanoa.studybuddies.ui.ViewGroup"
+            android:label="@string/title_activity_view_group" >
+        </activity>
+        <activity
+            android:name="edu.uhmanoa.studybuddies.ui.ViewGroupClass"
+            android:label="@string/title_activity_view_group_class" >
+        </activity>
     </application>
 
 </manifest>

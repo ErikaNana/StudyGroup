@@ -61,7 +61,7 @@ public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 			
 			//if confirmed, change it and can't be clickable
 			if (classmate.isConfirmedCreation()) {
-				holder.studentName.setTextColor(Color.DKGRAY);
+				holder.studentName.setTextColor(Color.LTGRAY);
 				view.setEnabled(false);
 				view.setBackgroundResource(R.drawable.gradient_bg);
 			}
