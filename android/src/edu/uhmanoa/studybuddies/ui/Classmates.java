@@ -30,6 +30,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.ResponseHandlerInterface;
@@ -130,6 +131,7 @@ public class Classmates extends Activity{
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 				Classmate student = (Classmate) parent.getAdapter().getItem(position);
+				makeToast(student);
 				if (!student.isConfirmedCreation()) {
 					if (clicked.contains(student)) {
 						clicked.remove(student);
@@ -177,6 +179,10 @@ public class Classmates extends Activity{
 		
 	}
 	
+	public void makeToast(Classmate classmate) {
+		Classmate found = classmatesDb.getClassmate(classmate);
+		Toast.makeText(getApplicationContext(), "student:  " + found.email, Toast.LENGTH_SHORT).show();
+	}
 	public void updateStudentCount() {
 		//only show available students
 		int counter = 0;

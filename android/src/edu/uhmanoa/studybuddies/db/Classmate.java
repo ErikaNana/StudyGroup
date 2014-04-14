@@ -4,8 +4,8 @@ public class Classmate {
 	public String name = "";
 	public String email = "";
 	public String className ="";
-	boolean isPendingCreation;
-	boolean isConfirmedForCreation;
+	boolean isPendingCreation; //not in a group yet
+	boolean isConfirmedForCreation; //was invited
 	
 	public Classmate(String name, String email, String className) {
 		this.name = name;

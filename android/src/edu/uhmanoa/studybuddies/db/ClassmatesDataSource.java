@@ -7,25 +7,27 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /*This class is responsible for storing and retrieving Classmate objects*/
 /*
  * 			 classmates.db
- * -----------------------------------------------
- * email |  name |  className  | group membership
- * -----------------------------------------------
+ * --------------------------------------------------
+ * email |  name |  className  | pending | confirmed
+ * ---------------------------------------------------
  */
 public class ClassmatesDataSource {
 
 	//Database fields
 	private SQLiteDatabase database;
 	private ClassmateSQLiteHelper helper;
-/*	private String [] allColumns = {ClassmateSQLiteHelper.COLUMN_EMAIL, ClassmateSQLiteHelper.COLUMN_NAME, ClassmateSQLiteHelper.COLUMN_CLASS_NAME, ClassmateSQLiteHelper.COLUMN_GROUP_MEMBERSHIP.toString()};*/
+	private String [] allColumns = {ClassmateSQLiteHelper.COLUMN_EMAIL, ClassmateSQLiteHelper.COLUMN_NAME, ClassmateSQLiteHelper.COLUMN_CLASS_NAME, ClassmateSQLiteHelper.COLUMN_PENDING_CREATION, ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION};
 	
 	public static int PENDING_CREATION = 1;
 	public static int NOT_PENDING_CREATION = 0;
 	public static int CONFIRMED_CREATION = 1;
 	public static int NOT_CONFIRMED_CREATION = 0;
+	
 	public ClassmatesDataSource(Context context) {
 		helper = new ClassmateSQLiteHelper(context);
 	}
@@ -88,10 +90,10 @@ public class ClassmatesDataSource {
 	
 	//gets a classmate given an email
 	//THIS NEEDS TO BE FIXED
-	public Classmate getClassmate(String getEmail) {
+	//ok this one doesn't make sense
+	public Classmate getClassmate(Classmate classmate) {
 		SQLiteDatabase db = helper.getReadableDatabase();
-		String selectQuery = "SELECT * FROM " + ClassmateSQLiteHelper.TABLE_NAME + "WHERE " + ClassmateSQLiteHelper.COLUMN_EMAIL + " = " + getEmail;
-		Cursor c = db.rawQuery(selectQuery, null);
+		Cursor c = db.rawQuery("SELECT * FROM " + ClassmateSQLiteHelper.TABLE_NAME +  " WHERE " + ClassmateSQLiteHelper.COLUMN_EMAIL + " = ?", new String[] {classmate.email});
 		
 		if (c!= null) {
 			c.moveToFirst();
@@ -110,10 +112,11 @@ public class ClassmatesDataSource {
 		int pending = c.getInt(pendingIndex);
 		int confirmed = c.getInt(confirmedIndex);
 		
-		Classmate classmate = new Classmate(name, email, className, pending, confirmed);
-		return classmate;
+		Classmate newClassmate = new Classmate(name, email, className, pending, confirmed);
+		return newClassmate;
 	}
 	
+
 	//gets all the classmates for a particular class
 	public ArrayList<Classmate> getClassmates(String className){
 		SQLiteDatabase db = helper.getReadableDatabase();
@@ -135,4 +138,34 @@ public class ClassmatesDataSource {
 		cursor.close();
 		return retrieved;
 	}
+	
+	//this should get pending and confirmed in group
+	public ArrayList<String> getPendingConfirmed(){
+		ArrayList<String> pendingClasses = new ArrayList<String>();
+		SQLiteDatabase db = helper.getReadableDatabase();
+		Cursor cursor = db.query(ClassmateSQLiteHelper.TABLE_NAME, allColumns, null, null, null, null, null);
+
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			//create a course object from each row in the table
+			String name = cursor.getString(1);
+			String email = cursor.getString(0);
+			String courseName = cursor.getString(2);
+			int pending = cursor.getInt(3);
+			int confirmed = cursor.getInt(4);
+			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed);
+			Log.w("classmate", "classmate:  " + classmate.getName() + ":  " + classmate.isPendingCreation());
+			if (classmate.isPendingCreation()) {
+				String className = classmate.getClassName();
+				if (!pendingClasses.contains(className)) {
+					pendingClasses.add(className);
+				}
+			}
+			cursor.moveToNext();
+		}
+		cursor.close();
+		Log.w("classmatesDb", "pendingClasses:  " + pendingClasses.toString());
+		return pendingClasses;
+	}
+	
 }
