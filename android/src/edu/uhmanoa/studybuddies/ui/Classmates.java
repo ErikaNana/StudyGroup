@@ -168,17 +168,26 @@ public class Classmates extends Activity{
 					}
 					//format and push data
 					String json = JsonUtils.getJson(clicked, userName, courseName);
-					postParams(json);
 					showPostingDialog();
-					Log.w("json", json);
+					postParams(json);
+/*					Log.w("json", json);*/
+					
+					
 				}
 			}
 		});
 		
 		updateStudentCount();
-		
 	}
 	
+	public void launchInvited(String courseName) {
+		Log.w("no launch", "no launch");
+		//go to view groups
+		Intent intent = new Intent(this, ViewGroupClass.class);
+		intent.putExtra("className", courseName);
+		startActivity(intent);
+		
+	}
 	public void makeToast(Classmate classmate) {
 		Classmate found = classmatesDb.getClassmate(classmate);
 		Toast.makeText(getApplicationContext(), "student:  " + found.email, Toast.LENGTH_SHORT).show();
@@ -243,7 +252,7 @@ public class Classmates extends Activity{
 				public void sendResponseMessage(HttpResponse response) throws IOException {
 					HttpEntity entity = response.getEntity();
 					String responseString = EntityUtils.toString(entity);
-					printThis(responseString);
+/*					printThis(responseString);*/
 				}
 				@Override
 				public void sendProgressMessage(int arg0, int arg1) {
@@ -305,10 +314,9 @@ public class Classmates extends Activity{
 			//do something here later if deleting groups or adding more people or whatever
 		}
 		//update the view
-		
 		pd.dismiss();
-		
 		updateStudentCount();
+		launchInvited(courseName);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
