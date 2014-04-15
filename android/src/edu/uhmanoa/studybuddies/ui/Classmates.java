@@ -37,14 +37,14 @@ import com.loopj.android.http.ResponseHandlerInterface;
 
 import edu.uhmanoa.studybuddies.R;
 import edu.uhmanoa.studybuddies.db.Classmate;
-import edu.uhmanoa.studybuddies.db.ClassmateAdapter;
+import edu.uhmanoa.studybuddies.db.ClassmateAdapterSelection;
 import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
 import edu.uhmanoa.studybuddies.utils.JsonUtils;
 
 public class Classmates extends Activity{
 	ListView mListOfClassmatesListView;
 	ArrayList<Classmate> mListOfClassmates;
-	ClassmateAdapter mAdapter;
+	ClassmateAdapterSelection mAdapter;
 	TextView mNumberOfStudents;
 	Button createGroup;
 	
@@ -95,7 +95,7 @@ public class Classmates extends Activity{
 		
 		//set up the listView
 		mListOfClassmates = classmatesDb.getClassmates(courseName);
-		mAdapter = new ClassmateAdapter(this, R.id.listOfStudents, mListOfClassmates);
+		mAdapter = new ClassmateAdapterSelection(this, R.id.listOfStudents, mListOfClassmates);
 		mListOfClassmatesListView.setAdapter(mAdapter);
 		
 		//set a scroll listener

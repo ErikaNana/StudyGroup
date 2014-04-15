@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +11,11 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import edu.uhmanoa.studybuddies.R;
 
-public class ClassmateAdapter extends ArrayAdapter<Classmate>{
+public class ClassmateAdapterDefault extends ArrayAdapter<Classmate>{
 	ArrayList<Classmate> mListOfClassmates;
 	Activity mActivity;
 
-	public ClassmateAdapter(Activity activity, int textViewResourceId, ArrayList<Classmate> listOfClassmates) {
+	public ClassmateAdapterDefault(Activity activity, int textViewResourceId, ArrayList<Classmate> listOfClassmates) {
         super(activity, textViewResourceId, listOfClassmates);
         mActivity = activity;
         mListOfClassmates = listOfClassmates;
@@ -50,21 +49,7 @@ public class ClassmateAdapter extends ArrayAdapter<Classmate>{
 		if (classmate != null) {
 			//set course title
 			holder.studentName.setText(classmate.getName());
-			//keep the ones that are selected, selected
-			//pending as in pending group formation
-			if (classmate.isPendingCreation()){
-				view.setBackgroundResource(R.drawable.gradient_bg_hover);
-			}
-			else {
-				view.setBackgroundResource(R.drawable.gradient_bg);
-			}
-			
-			//if confirmed, change it and can't be clickable
-			if (classmate.isConfirmedCreation()) {
-				holder.studentName.setTextColor(Color.LTGRAY);
-				view.setEnabled(false);
-				view.setBackgroundResource(R.drawable.gradient_bg);
-			}
+			view.setBackgroundResource(R.drawable.gradient_bg);
 		}
 
 		return view;

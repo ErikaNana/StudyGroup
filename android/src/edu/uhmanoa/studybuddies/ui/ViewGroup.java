@@ -3,6 +3,7 @@ package edu.uhmanoa.studybuddies.ui;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -45,7 +46,7 @@ public class ViewGroup extends Activity {
 		coursesDb.open();
 		
 		ArrayList<String> pendingConfirmed = new ArrayList<String>();
-		pendingConfirmed = classmatesDb.getPendingConfirmed();
+		pendingConfirmed = classmatesDb.getPendingClasses();
 		ArrayList<Course> pendingConfirmedClasses = new ArrayList<Course>();
 		
 		for (String pending: pendingConfirmed) {
@@ -105,7 +106,7 @@ public class ViewGroup extends Activity {
 				public void onItemClick(AdapterView<?> parent, View view, int position,
 						long id) {
 					mCourseLookingAt = (Course) mListOfClassesListView.getItemAtPosition(position);
-					
+					launchStudents(mCourseLookingAt.getName());
 				}	
 			});
 			
@@ -115,6 +116,11 @@ public class ViewGroup extends Activity {
 		Log.w("pending", pendingConfirmed.toString());
 	}
 
+	public void launchStudents(String className) {
+		Intent intent = new Intent(this, ViewGroupClass.class);
+		intent.putExtra("className", className);
+		startActivity(intent);
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

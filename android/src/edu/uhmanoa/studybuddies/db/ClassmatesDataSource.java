@@ -15,6 +15,9 @@ import android.util.Log;
  * --------------------------------------------------
  * email |  name |  className  | pending | confirmed
  * ---------------------------------------------------
+ * 
+ * pending = not sure if selected
+ * confirmed = actually invited to group  --> need this for listview
  */
 public class ClassmatesDataSource {
 
@@ -140,7 +143,7 @@ public class ClassmatesDataSource {
 	}
 	
 	//this should get pending and confirmed in group
-	public ArrayList<String> getPendingConfirmed(){
+	public ArrayList<String> getPendingClasses(){
 		ArrayList<String> pendingClasses = new ArrayList<String>();
 		SQLiteDatabase db = helper.getReadableDatabase();
 		Cursor cursor = db.query(ClassmateSQLiteHelper.TABLE_NAME, allColumns, null, null, null, null, null);
@@ -168,4 +171,26 @@ public class ClassmatesDataSource {
 		return pendingClasses;
 	}
 	
+	public ArrayList<Classmate> getInvited(String className){
+		Log.w("className", "className:  " + className);
+		Log.w("creation", String.valueOf(CONFIRMED_CREATION));
+		SQLiteDatabase db = helper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT * FROM " + ClassmateSQLiteHelper.TABLE_NAME +  " WHERE " + ClassmateSQLiteHelper.COLUMN_CLASS_NAME + " = ? AND " + ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION + " = ?", new String[] {className, String.valueOf(CONFIRMED_CREATION)});
+		cursor.moveToFirst();
+		ArrayList<Classmate> retrieved = new ArrayList<Classmate>();
+		while(!cursor.isAfterLast()) {
+			//create classMate from each row in cursor
+			String name = cursor.getString(1);
+			String email = cursor.getString(0);
+			String courseName = cursor.getString(2);
+			int pending = cursor.getInt(3);
+			int confirmed = cursor.getInt(4);
+			
+			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed);
+			retrieved.add(classmate);
+			cursor.moveToNext();
+		}
+		cursor.close();
+		return retrieved;
+	}
 }
