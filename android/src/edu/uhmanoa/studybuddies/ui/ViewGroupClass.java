@@ -12,7 +12,7 @@ public class ViewGroupClass extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.view_group_class);
+		setContentView(R.layout.classmates_for_group);
 	}
 
 	@Override
