@@ -170,8 +170,8 @@ public class Classmates extends Activity{
 					String json = JsonUtils.getJson(clicked, userName, courseName);
 					showPostingDialog();
 					postParams(json);
+					launchInvited();
 /*					Log.w("json", json);*/
-					
 					
 				}
 			}
@@ -180,7 +180,7 @@ public class Classmates extends Activity{
 		updateStudentCount();
 	}
 	
-	public void launchInvited(String courseName) {
+	public void launchInvited() {
 		Log.w("no launch", "no launch");
 		//go to view groups
 		Intent intent = new Intent(this, ViewGroupClass.class);
@@ -302,6 +302,7 @@ public class Classmates extends Activity{
 	
 	public void updateGroups(String courseName) {
 		//update createGroups 
+		Log.w("in update", "updateGroups");
 		Set<String> createdGroups = prefs.getStringSet(CREATED_GROUPS, null);
 		if (createdGroups == null) {
 			ArrayList<String> group = new ArrayList<String>();
@@ -316,7 +317,6 @@ public class Classmates extends Activity{
 		//update the view
 		pd.dismiss();
 		updateStudentCount();
-		launchInvited(courseName);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
