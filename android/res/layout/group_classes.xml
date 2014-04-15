@@ -7,10 +7,21 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ViewGroup" >
-
-    <TextView
+    <TextView 
+        android:id="@+id/numberOfClassesGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
-
+        android:textSize="22sp"
+        android:typeface="sans"
+        android:textStyle="bold"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        /> 
+     <ListView 
+          android:id="@+id/listOfClassesGroup"
+          android:layout_marginTop="8dip"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/numberOfClassesGroup">
+        </ListView>
 </RelativeLayout>
