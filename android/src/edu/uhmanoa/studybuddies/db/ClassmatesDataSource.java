@@ -12,9 +12,9 @@ import android.util.Log;
 /*This class is responsible for storing and retrieving Classmate objects*/
 /*
  * 			 classmates.db
- * --------------------------------------------------
- * email |  name |  className  | pending | confirmed
- * ---------------------------------------------------
+ * --------------------------------------------------------------------------------
+ * email |  name |  className  | pending creation | confirmed creation | joined
+ * ---------------------------------------------------------------------------------
  * 
  * pending = not sure if selected
  * confirmed = actually invited to group  --> need this for listview
@@ -30,6 +30,8 @@ public class ClassmatesDataSource {
 	public static int NOT_PENDING_CREATION = 0;
 	public static int CONFIRMED_CREATION = 1;
 	public static int NOT_CONFIRMED_CREATION = 0;
+	public static int JOINED = 1;
+	public static int NOT_JOINED = 0;
 	
 	public ClassmatesDataSource(Context context) {
 		helper = new ClassmateSQLiteHelper(context);
@@ -56,7 +58,7 @@ public class ClassmatesDataSource {
 		values.put(ClassmateSQLiteHelper.COLUMN_CLASS_NAME, className);
 		values.put(ClassmateSQLiteHelper.COLUMN_PENDING_CREATION, classmate.isPendingCreation); //default to not in group
 		values.put(ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION, classmate.isConfirmedCreation()); //default to not in group
-		
+		values.put(ClassmateSQLiteHelper.COLUMN_JOINED, classmate.joined);
 		database.insert(ClassmateSQLiteHelper.TABLE_NAME, null, values);
 	}
 	
@@ -108,14 +110,16 @@ public class ClassmatesDataSource {
 		int classNameIndex = c.getColumnIndex(ClassmateSQLiteHelper.COLUMN_CLASS_NAME);
 		int pendingIndex = c.getColumnIndex(ClassmateSQLiteHelper.COLUMN_PENDING_CREATION);
 		int confirmedIndex = c.getColumnIndex(ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION);
+		int joinedIndex = c.getColumnIndex(ClassmateSQLiteHelper.COLUMN_JOINED);
 		
 		String name = c.getString(nameIndex);
 		String email = c.getString(emailIndex);
 		String className = c.getString(classNameIndex);
 		int pending = c.getInt(pendingIndex);
 		int confirmed = c.getInt(confirmedIndex);
+		int joined = c.getInt(joinedIndex);
 		
-		Classmate newClassmate = new Classmate(name, email, className, pending, confirmed);
+		Classmate newClassmate = new Classmate(name, email, className, pending, confirmed, joined);
 		return newClassmate;
 	}
 	
@@ -133,8 +137,8 @@ public class ClassmatesDataSource {
 			String courseName = cursor.getString(2);
 			int pending = cursor.getInt(3);
 			int confirmed = cursor.getInt(4);
-			
-			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed);
+			int joined = cursor.getInt(5);
+			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed, joined);
 			retrieved.add(classmate);
 			cursor.moveToNext();
 		}
@@ -156,7 +160,8 @@ public class ClassmatesDataSource {
 			String courseName = cursor.getString(2);
 			int pending = cursor.getInt(3);
 			int confirmed = cursor.getInt(4);
-			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed);
+			int joined = cursor.getInt(5);
+			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed, joined);
 			Log.w("classmate", "classmate:  " + classmate.getName() + ":  " + classmate.isPendingCreation());
 			if (classmate.isPendingCreation()) {
 				String className = classmate.getClassName();
@@ -185,8 +190,29 @@ public class ClassmatesDataSource {
 			String courseName = cursor.getString(2);
 			int pending = cursor.getInt(3);
 			int confirmed = cursor.getInt(4);
-			
-			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed);
+			int joined = cursor.getInt(5);
+			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed, joined);
+			retrieved.add(classmate);
+			cursor.moveToNext();
+		}
+		cursor.close();
+		return retrieved;
+	}
+	
+	public ArrayList<Classmate> getJoined(String className){
+		SQLiteDatabase db = helper.getReadableDatabase();
+		Cursor cursor = db.rawQuery("SELECT * FROM " + ClassmateSQLiteHelper.TABLE_NAME +  " WHERE " + ClassmateSQLiteHelper.COLUMN_CLASS_NAME + " = ? AND " + ClassmateSQLiteHelper.COLUMN_JOINED + " = ?", new String[] {className, String.valueOf(JOINED)});
+		cursor.moveToFirst();
+		ArrayList<Classmate> retrieved = new ArrayList<Classmate>();
+		while(!cursor.isAfterLast()) {
+			//create classMate from each row in cursor
+			String name = cursor.getString(1);
+			String email = cursor.getString(0);
+			String courseName = cursor.getString(2);
+			int pending = cursor.getInt(3);
+			int confirmed = cursor.getInt(4);
+			int joined = cursor.getInt(5);
+			Classmate classmate = new Classmate(name, email,courseName, pending, confirmed, joined);
 			retrieved.add(classmate);
 			cursor.moveToNext();
 		}

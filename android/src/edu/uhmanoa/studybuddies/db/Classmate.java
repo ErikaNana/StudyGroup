@@ -6,6 +6,7 @@ public class Classmate {
 	public String className ="";
 	boolean isPendingCreation; //not in a group yet
 	boolean isConfirmedForCreation; //was invited
+	boolean joined;
 	
 	public Classmate(String name, String email, String className) {
 		this.name = name;
@@ -13,19 +14,25 @@ public class Classmate {
 		this.className = className;
 		this.isPendingCreation = false;
 		this.isConfirmedForCreation = false;
+		this.joined = false;
 	}
 	
-	public Classmate(String name, String email, String className, int pending, int confirmed) {
+	public Classmate(String name, String email, String className, int pending, int confirmed, int joined) {
 		this.name = name;
 		this.email = email;
 		this.className = className;
 		this.isPendingCreation = false;
 		this.isConfirmedForCreation = false;
+		this.joined = false;
+		
 		if (pending == ClassmatesDataSource.PENDING_CREATION) {
 			this.isPendingCreation = true;
 		}
 		if (confirmed == ClassmatesDataSource.CONFIRMED_CREATION) {
 			this.isConfirmedForCreation = true;
+		}
+		if (joined == ClassmatesDataSource.JOINED) {
+			this.joined = true;
 		}
 	}
 	
@@ -70,6 +77,19 @@ public class Classmate {
 		}
 		else {
 			isConfirmedForCreation = false;
+		}
+	}
+	
+	public boolean isJoined() {
+		return joined;
+	}
+	
+	public void setJoined(boolean click) {
+		if (click) {
+			joined = true;
+		}
+		else {
+			joined = false;
 		}
 	}
 
