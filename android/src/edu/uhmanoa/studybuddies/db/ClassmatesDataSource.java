@@ -24,7 +24,7 @@ public class ClassmatesDataSource {
 	//Database fields
 	private SQLiteDatabase database;
 	private ClassmateSQLiteHelper helper;
-	private String [] allColumns = {ClassmateSQLiteHelper.COLUMN_EMAIL, ClassmateSQLiteHelper.COLUMN_NAME, ClassmateSQLiteHelper.COLUMN_CLASS_NAME, ClassmateSQLiteHelper.COLUMN_PENDING_CREATION, ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION};
+	private String [] allColumns = {ClassmateSQLiteHelper.COLUMN_EMAIL, ClassmateSQLiteHelper.COLUMN_NAME, ClassmateSQLiteHelper.COLUMN_CLASS_NAME, ClassmateSQLiteHelper.COLUMN_PENDING_CREATION, ClassmateSQLiteHelper.COLUMN_CONFIRMED_CREATION, ClassmateSQLiteHelper.COLUMN_JOINED};
 	
 	public static int PENDING_CREATION = 1;
 	public static int NOT_PENDING_CREATION = 0;

@@ -10,36 +10,38 @@
     tools:context=".ViewGroupClass" >
     <TextView 
           android:id="@+id/studentsInvited"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:textSize="22sp"
           android:typeface="sans"
           android:text="@string/app_name"
           android:textStyle="bold"
+          android:background="@drawable/gradient_bg_hover"
+          android:padding="10dp"
           />
      <ListView 
           android:id="@+id/listOfInvited"
           android:layout_width="match_parent"
           android:layout_height="0dip"
-          android:layout_marginTop="8dip"
           android:layout_marginBottom="5dip"
           android:layout_weight="0.5">
      </ListView>
      <TextView 
           android:id="@+id/studentsJoined"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:textSize="22sp"
           android:typeface="sans"
           android:textStyle="bold"
           android:layout_marginTop="8dip"
           android:text="@string/app_name"
+          android:background="@drawable/gradient_bg_hover"
+          android:padding="10dp"
           />
     <ListView 
           android:id="@+id/listOfJoined"
           android:layout_width="match_parent"
           android:layout_height="0dip"
-          android:layout_weight="0.5"
-          android:layout_marginTop="8dip">
+          android:layout_weight="0.5">
      </ListView>
 </LinearLayout>
