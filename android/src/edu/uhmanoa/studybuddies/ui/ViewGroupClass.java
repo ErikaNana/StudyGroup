@@ -115,5 +115,11 @@ public class ViewGroupClass extends Activity {
 		getMenuInflater().inflate(R.menu.view_group_class, menu);
 		return true;
 	}
+	
+	@Override
+	public void onBackPressed() {
+		Intent launchHome = new Intent(this,Home.class);
+		startActivity(launchHome);
+	}
 
 }
