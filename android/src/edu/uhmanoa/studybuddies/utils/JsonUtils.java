@@ -20,7 +20,6 @@ public class JsonUtils{
 			//create classmate json object
 			JsonObject jsonClassmate = new JsonObject();
 			jsonClassmate.addProperty("name", classmate.name);
-			jsonClassmate.addProperty("className", classmate.className);
 			jsonClassmate.addProperty("email", classmate.email);
 			jsonClassmate.addProperty("isMember", classmate.isPendingCreation());
 			
@@ -30,6 +29,7 @@ public class JsonUtils{
 				
 		JsonObject jsonContainer = new JsonObject();
 		jsonContainer.addProperty("user", userName);
+		jsonContainer.addProperty("class", className);
 		jsonContainer.add("members", jsonArray);
 		json.add("createGroup", jsonContainer);
 		GsonBuilder gsonBuilder = new GsonBuilder();

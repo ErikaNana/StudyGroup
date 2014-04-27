@@ -170,8 +170,8 @@ public class Classmates extends Activity{
 					String json = JsonUtils.getJson(clicked, userName, courseName);
 					showPostingDialog();
 					postParams(json);
+					Log.w("json", json);
 					launchInvited();
-/*					Log.w("json", json);*/
 					
 				}
 			}
