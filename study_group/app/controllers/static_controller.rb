@@ -14,4 +14,7 @@ class StaticController < ApplicationController
         @user = info[:user]
         @members = params[:createGroup][:members]
     end
+
+    def display_schedule
+    end
 end
