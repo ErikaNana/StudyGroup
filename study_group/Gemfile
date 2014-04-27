@@ -13,6 +13,7 @@ group :development, :test do
     gem 'spork-rails'
     gem 'guard-spork'
     gem 'childprocess'
+    gem 'guard-livereload', require: false
     gem 'bootstrap-sass'
 end
 

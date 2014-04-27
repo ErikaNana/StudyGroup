@@ -49,7 +49,11 @@ GEM
       execjs
     coffee-script-source (1.6.3)
     diff-lcs (1.2.5)
+    em-websocket (0.5.1)
+      eventmachine (>= 0.12.9)
+      http_parser.rb (~> 0.6.0)
     erubis (2.7.0)
+    eventmachine (1.0.3)
     execjs (2.0.2)
     ffi (1.9.3)
     formatador (0.2.4)
@@ -59,6 +63,10 @@ GEM
       lumberjack (~> 1.0)
       pry (>= 0.9.12)
       thor (>= 0.18.1)
+    guard-livereload (2.1.2)
+      em-websocket (~> 0.5)
+      guard (~> 2.0)
+      multi_json (~> 1.8)
     guard-rspec (4.2.4)
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
@@ -69,6 +77,7 @@ GEM
     haml (4.0.5)
       tilt
     hike (1.2.3)
+    http_parser.rb (0.6.0)
     i18n (0.6.9)
     jbuilder (1.5.3)
       activesupport (>= 3.0.0)
@@ -196,6 +205,7 @@ DEPENDENCIES
   capybara
   childprocess
   coffee-rails (~> 4.0.0)
+  guard-livereload
   guard-rspec
   guard-spork
   haml
