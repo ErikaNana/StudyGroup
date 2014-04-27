@@ -21,7 +21,7 @@ public class Initial extends Activity {
 		TextView authenticate = (TextView) findViewById(R.id.authenticate);
 		SharedPreferences prefs = this.getSharedPreferences(FIRST_USE, Context.MODE_PRIVATE);
 		//for debugging
-/*		prefs.edit().putBoolean(Initial.FIRST_USE, true).apply();*/
+		prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
 		prefs.edit().putString(Authenticate.USER_NAME, "enana").apply();
 		//use a default value if there is none
 		boolean firstUse = prefs.getBoolean(FIRST_USE, true);

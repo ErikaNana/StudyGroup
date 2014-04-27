@@ -1,12 +1,17 @@
 package edu.uhmanoa.studybuddies.ui;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.entity.StringEntity;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
@@ -14,14 +19,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import edu.uhmanoa.studybuddies.R;
-import edu.uhmanoa.studybuddies.db.Classmate;
-import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
-import edu.uhmanoa.studybuddies.db.Course;
-import edu.uhmanoa.studybuddies.db.CourseAdapter;
-import edu.uhmanoa.studybuddies.db.CoursesDataSource;
-import edu.uhmanoa.studybuddies.utils.ClassInfoUtils;
-import edu.uhmanoa.studybuddies.utils.RosterUtils;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -38,6 +35,22 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.ResponseHandlerInterface;
+
+import edu.uhmanoa.studybuddies.R;
+import edu.uhmanoa.studybuddies.db.Classmate;
+import edu.uhmanoa.studybuddies.db.ClassmatesDataSource;
+import edu.uhmanoa.studybuddies.db.Course;
+import edu.uhmanoa.studybuddies.db.CourseAdapter;
+import edu.uhmanoa.studybuddies.db.CoursesDataSource;
+import edu.uhmanoa.studybuddies.utils.ClassInfoUtils;
+import edu.uhmanoa.studybuddies.utils.RosterUtils;
 
 //REMEMBER TO CLOSE CLASSMTES DB ON DESTROY OF ACTIVITY
 //ONLY DELETE FOR DATABASES IF THIS IS THE FIRST TIME (CHANGE SHARED PREFERENCES)
@@ -332,6 +345,10 @@ public class GetClasses extends Activity {
 		//set the preference variable
 		SharedPreferences prefs = this.getSharedPreferences(Initial.FIRST_USE, Context.MODE_PRIVATE);
 		prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
+		getScheduleJson();
+		//send json
+		/*postSchedule(getScheduleJson());*/
+		
 		startActivity(launchHome);
 	}
 	private void launchStudentsView(Course mCourseLookingAt) {
@@ -421,8 +438,6 @@ public class GetClasses extends Activity {
 		for (Course course: classes) {
 			mListOfClasses.add(course);
 		}
-		
-		coursesDb.close();
 		//update the view
 		if (mAdapter != null) {
 			mAdapter.notifyDataSetChanged();
@@ -563,6 +578,124 @@ public class GetClasses extends Activity {
 					}
 				}
 			}
+		}
+	}
+	
+	public String getScheduleJson() {
+		JsonObject json = new JsonObject(); //overall container
+		JsonArray courseArray = new JsonArray(); //array of courses
+		ArrayList<Course> courses = coursesDb.getAllCourses();
+		SharedPreferences prefs = this.getSharedPreferences(Authenticate.USER_NAME, Context.MODE_PRIVATE);
+		String userName = prefs.getString(Authenticate.USER_NAME, "nobody");
+		
+		for (Course course: courses) {
+			//create classmate json object
+			JsonObject jsonCourse = new JsonObject();
+			jsonCourse.addProperty("name", course.getName());
+			JsonArray daysArray = new JsonArray();
+			ArrayList<String> days = course.getDays();
+			ArrayList<String> times = course.getTimes();
+			
+			for (int i = 0; i < days.size(); i++) {
+				JsonObject jsonDays = new JsonObject();
+				jsonDays.addProperty("days", days.get(i));
+				jsonDays.addProperty("times", times.get(i));
+				daysArray.add(jsonDays);
+			}
+
+			jsonCourse.add("courseInfo", daysArray);
+			//add to array
+			courseArray.add(jsonCourse);
+		}
+				
+		JsonObject jsonContainer = new JsonObject();
+		jsonContainer.addProperty("user", userName);
+		jsonContainer.add("courses", courseArray);
+		
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.setPrettyPrinting();
+		Gson gson = gsonBuilder.create();
+		
+		coursesDb.close();
+		//string formatted json
+		Log.w("schedule json", gson.toJson(json));
+		return gson.toJson(json);
+	}
+	public void postSchedule(String json) {
+		AsyncHttpClient client = new AsyncHttpClient();
+		String url = "http://study-group-creator.herokuapp.com/create";
+		Context context = this.getApplicationContext();
+		try {
+			StringEntity entity = new StringEntity(json);
+			
+			client.post(context, url, entity, "application/json", new ResponseHandlerInterface() {
+				
+				@Override
+				public void sendResponseMessage(HttpResponse response) throws IOException {
+				}
+				@Override
+				public void sendProgressMessage(int arg0, int arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void sendFinishMessage() {
+					/*updateGroups(courseName);*/
+				}
+				
+				@Override
+				public void sendFailureMessage(int arg0, Header[] arg1, byte[] arg2,
+						Throwable arg3) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public URI getRequestURI() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				@Override
+				public Header[] getRequestHeaders() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+				@Override
+				public void sendRetryMessage() {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void sendStartMessage() {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void sendSuccessMessage(int arg0, Header[] arg1,
+						byte[] arg2) {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void setRequestHeaders(Header[] arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void setRequestURI(URI arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void setUseSynchronousMode(boolean arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
 	}
 }

@@ -57,10 +57,12 @@ public class CoursesDataSource {
 			//create a course object from each row in the table
 			String name = cursor.getString(0);
 			String days = cursor.getString(1);
+			Log.w("days", days);
 			String times = cursor.getString(2);
+			Log.w("times", times);
 			Course course = new Course(name);
-			course.setFullTime(times);
-			course.setFullDays(days);
+			course.setTimes(times);
+			course.setDays(days);
 			courses.add(course);
 			cursor.moveToNext();
 		}
@@ -88,8 +90,8 @@ public class CoursesDataSource {
 		//create a course to return
 		Course course = new Course();
 		course.setName(courseName);
-		course.setFullDays(days);
-		course.setFullTime(times);
+		course.setDays(days);
+		course.setTimes(times);
 		
 		Log.w("getCourse", "print:  " + course);
 		return course;

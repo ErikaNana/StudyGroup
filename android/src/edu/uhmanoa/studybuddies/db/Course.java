@@ -1,6 +1,7 @@
 package edu.uhmanoa.studybuddies.db;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 //arrayLists always maintain the order
 public class Course {
@@ -51,7 +52,7 @@ public class Course {
 	}
 	
 	public String toString() {
-		return "Name:  " + name + " Times:  " + fullTime + " Days:  " + fullDays + "\n";
+		return "Name:  " + name + " Times:  " + getStringOfTimes() + " Days:  " + getStringOfDays() + "\n";
 	}
 	
 	//idk what these two methods would be for...just for testing attribute assignment?
@@ -80,11 +81,19 @@ public class Course {
 	}
 	
 	//for recreating
-	public void setFullTime(String fullTime) {
+	public void setTimes(String fullTime) {
+		//delimit by space and recreate times
+		String[] timeArray = fullTime.split(" ");
+		times = new ArrayList<String>();
+		Collections.addAll(times, timeArray);
 		this.fullTime = fullTime;
 	}
 	
-	public void setFullDays(String fullDays) {
+	public void setDays(String fullDays) {
+		//delimit by space and recreate times
+		String[] daysArray = fullDays.split(" ");
+		days = new ArrayList<String>();
+		Collections.addAll(days, daysArray);
 		this.fullDays = fullDays;
 	}
 }
