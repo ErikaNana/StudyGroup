@@ -9,10 +9,11 @@ class StaticController < ApplicationController
     def display_group_formation
         #for now
         info = params[:createGroup]
-        course = info[:class]
+        course_name = info[:class]
+        @course = Course.find_by_name(course_name)
 
         # returns hash map
-        @master = info[:user]
+        @master = Student.find_by_email(info[:user])
         members = info[:members]
 
         group_members = "";
@@ -32,7 +33,16 @@ class StaticController < ApplicationController
 
         #need to do error checking on this later
         #construct the group
-        @group = InvitedGroup.create(name: course+@master, members: group_members, master: @master)
+        @group = InvitedGroup.create(name: @course.name + @master.name, members: group_members, master: @master.name)
+
+        #invite the members
+        @invitees = Array.new
+        members.each do |member|
+            email = member[:email]
+            invitee = Student.find_by_email(email)
+            @invitees.push(invitee)
+            StudentMailer.invitation_email(@master, invitee, @course).deliver
+        end
 
     end
 
