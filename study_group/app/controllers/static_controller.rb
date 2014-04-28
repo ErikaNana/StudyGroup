@@ -40,11 +40,20 @@ class StaticController < ApplicationController
             days.chop!
             times.chop!
 
-            #create course objects
-            #need to check if it exists first, but this can be done later
-            add_course = Course.create(name: course[:name], days:days, times:times)
-            #if it exists, just add that
-            @courseArray.push(add_course)
+            #if doesn't exist, then create it
+            add_course = nil
+            course_name = course[:name]
+
+            check_course = Course.find_by_name(course_name)
+            if check_course
+                @courseArray.push(check_course)
+                @found = "found"
+            else
+                add_course = Course.create(name: course[:name], days:days, times:times)
+                @found = "not found"
+                #if it exists, just add that
+                @courseArray.push(add_course)
+            end
         end
     end
 end
