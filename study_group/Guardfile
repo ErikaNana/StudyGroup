@@ -2,6 +2,8 @@
 # More info at https://github.com/guard/guard#readme
 require 'active_support/inflector'
 
+<<<<<<< HEAD
+=======
 guard 'livereload' do
   watch(%r{app/views/.+\.(erb|haml|slim)})
   watch(%r{app/helpers/.+\.rb})
@@ -11,6 +13,7 @@ guard 'livereload' do
   watch(%r{(app|vendor)(/assets/\w+/(.+\.(css|js|html))).*}) { |m| "/assets/#{m[3]}" }
 end
 
+>>>>>>> Added schedule
 guard 'spork', :cucumber_env => { 'RAILS_ENV' => 'test' }, :rspec_env => { 'RAILS_ENV' => 'test' } do
   watch('config/application.rb')
   watch('config/environment.rb')

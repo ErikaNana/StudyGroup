@@ -16,5 +16,9 @@ class StaticController < ApplicationController
     end
 
     def display_schedule
+    schedule = params[:userSchedule]
+    user = schedule[:user]
+    # [{name: name, courseInfo: [{day: days, time: times}, {day: days}, time: times]}]
+    courses = schedule[:courses]
     end
 end
