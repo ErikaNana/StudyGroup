@@ -1,26 +1,9 @@
 %h1 Success
 
-="User:  " + @user
-="info size:  " + @info_size.to_s
-="size:  " + @members.size.to_s
-Members
+="Master:  " + @master
 
-%table
-  %thead
-    %tr
-      %th Name
-      %th Class
-      %th Email
-      %th IsMember
-
-  %tbody
-    -@members.each do |member|
-      %tr
-        %td
-        =member[:name]
-        =member[:className]
-        =member[:email]
-        =member[:isMember]
-
-/ Print Members
-/ =@members
+Group Created:
+name:
+=@group.name
+members:
+=@group.members

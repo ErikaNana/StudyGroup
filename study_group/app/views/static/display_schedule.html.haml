@@ -2,7 +2,12 @@
 //[{name: name, courseInfo: [{day: days, time: times}, {day: days}, time: times]}]
 
 ="User:  " + @user
+= "Schedule:  " + @student.schedule
+= "Email:  " + @student.email
+= "Name:  " + @student.name
+= "Type:  " + @student.student_type
 = "Found:  " + @found
+
 %table
   %thead
     %tr
@@ -19,6 +24,3 @@
           = course.days
         %td
           = course.times
-
-/ Print Members
-/ =@members
