@@ -1,1 +1,24 @@
-%h1 Schedule Success
+%h1 Schedule success
+//[{name: name, courseInfo: [{day: days, time: times}, {day: days}, time: times]}]
+
+="User:  " + @user
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th Days
+      %th Times
+
+  %tbody
+    -@courseArray.each do |course|
+      %tr
+        %td
+          = course.name
+        %td
+          = course.days
+        %td
+          = course.times
+
+/ Print Members
+/ =@members
