@@ -209,7 +209,7 @@ public class Classmates extends Activity{
 	}
 	public void postParams(String json) {
 		AsyncHttpClient client = new AsyncHttpClient();
-		String url = "http://study-group-creator.herokuapp.com/create";
+		String url = "http://study-buddies-manoa.herokuapp.com/create";
 		Context context = this.getApplicationContext();
 		try {
 			StringEntity entity = new StringEntity(json);

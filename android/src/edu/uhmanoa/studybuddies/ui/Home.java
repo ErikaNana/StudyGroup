@@ -1,11 +1,22 @@
 package edu.uhmanoa.studybuddies.ui;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.ResponseHandlerInterface;
 
 import android.app.Activity;
 import android.content.Context;
@@ -89,9 +100,92 @@ public class Home extends Activity implements OnClickListener{
 		
 /*		coursesDb.close();
 		classmatesDb.close();*/
-		getScheduleJson();
+/*		getScheduleJson();*/
+		postSchedule(getScheduleJson());
+	}
+	public void postSchedule(String json) {
+		AsyncHttpClient client = new AsyncHttpClient();
+		String url = "http://study-buddies-manoa.herokuapp.com/schedule";
+		Context context = this.getApplicationContext();
+		try {
+			StringEntity entity = new StringEntity(json);
+			client.post(context, url, entity, "application/json", new ResponseHandlerInterface() {
+				
+				@Override
+				public void setUseSynchronousMode(boolean arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void setRequestURI(URI arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void setRequestHeaders(Header[] arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void sendSuccessMessage(int statusCode, Header[] headers, byte[] responseBody) {
+					// TODO Auto-generated method stub
+				}
+				
+				@Override
+				public void sendStartMessage() {
+				}
+				
+				@Override
+				public void sendRetryMessage() {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void sendResponseMessage(HttpResponse response) throws IOException {
+					HttpEntity entity = response.getEntity();
+					String responseString = EntityUtils.toString(entity);
+					Log.w("schedule response", responseString);
+				}
+				@Override
+				public void sendProgressMessage(int arg0, int arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void sendFinishMessage() {
+					//do nothing for now
+				}
+				
+				@Override
+				public void sendFailureMessage(int arg0, Header[] arg1, byte[] arg2,
+						Throwable arg3) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public URI getRequestURI() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				@Override
+				public Header[] getRequestHeaders() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			});
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
 	public String getScheduleJson() {
+		JsonObject json = new JsonObject();
 		JsonArray courseArray = new JsonArray(); //array of courses
 		ArrayList<Course> courses = coursesDb.getAllCourses();
 		SharedPreferences prefs = this.getSharedPreferences(Authenticate.USER_NAME, Context.MODE_PRIVATE);
@@ -120,6 +214,7 @@ public class Home extends Activity implements OnClickListener{
 		JsonObject jsonContainer = new JsonObject();
 		jsonContainer.addProperty("user", userName);
 		jsonContainer.add("courses", courseArray);
+		json.add("userSchedule", jsonContainer);
 		
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.setPrettyPrinting();
@@ -127,8 +222,8 @@ public class Home extends Activity implements OnClickListener{
 		
 		coursesDb.close();
 		//string formatted json
-		Log.w("schedule json", gson.toJson(jsonContainer));
-		return gson.toJson(jsonContainer);
+		Log.w("schedule json", gson.toJson(json));
+		return gson.toJson(json);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
