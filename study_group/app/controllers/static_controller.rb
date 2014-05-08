@@ -6,6 +6,10 @@ class StaticController < ApplicationController
     def create
     end
 
+    def accept_invitation
+        @group_name = params[:group_name]
+    end
+
     def display_group_formation
         #for now
         info = params[:createGroup]
@@ -44,7 +48,7 @@ class StaticController < ApplicationController
             email = member[:email]
             invitee = Student.find_by_email(email)
             @invitees.push(invitee)
-            StudentMailer.invitation_email(@master, invitee, @course).deliver
+            StudentMailer.invitation_email(@master, invitee, @course, @invited_group).deliver
         end
 
     end

@@ -5,3 +5,5 @@
     %body
         %h1 Welcome to StuddyBuddies!
         %p Hello #{@invitee.name}, #{@inviter.name} from #{@course.name} has invited you to be part of their study group.
+        %a{:href => "http://study-buddies-manoa.herokuapp.com/accept_invitation/#{@invited_group.name}"} Join Group
+        / =button_to 'Join Group', accept_invitation_path(@invited_group.name)
