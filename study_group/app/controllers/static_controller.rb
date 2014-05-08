@@ -12,6 +12,7 @@ class StaticController < ApplicationController
         @invited_group = InvitedGroup.find_by_name(@group_name)
         @confirmed_group = ConfirmedGroups.find_by_name(@group_name)
         #add a member to the confirmed group
+        @confirmed_group.add_member(@invitee)
         #delete a member from the invited group
         @updated_invited_group = InvitedGroup.find_by_name(@group_name).delete_member(@invitee)
         #send notification to Android app
@@ -19,7 +20,10 @@ class StaticController < ApplicationController
 
     def deny_invitation
         @group_name = params[:group_name]
+        @invitee = params[:invitee]
+        @invited_group = InvitedGroup.find_by_name(@group_name)
         #delete the member from the invited group
+        @updated_invited_group = InvitedGroup.find_by_name(@group_name).delete_member(@invitee)
         #send notification to Android app
     end
 
