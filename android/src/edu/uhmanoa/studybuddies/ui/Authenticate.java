@@ -36,14 +36,18 @@ public class Authenticate extends Activity implements OnClickListener {
 	String mLoginResponse;
 	EditText mUserNameBox;
 	EditText mPasswordBox;
+	EditText mFullNameBox;
+	
 	Context mContext;
 	ProgressDialog pd;
 	String mUserName;
 	String mPassword;
 	String mCookieValue;
+	String mFullName;
 	
 	//username
 	public static final String USER_NAME = "userName";
+	public static final String FULL_NAME = "fullName";
 	
 	//urls;
 	public static final String LAULIMA_LOGIN = "https://laulima.hawaii.edu/portal/xlogin";
@@ -68,7 +72,7 @@ public class Authenticate extends Activity implements OnClickListener {
 		
 		mUserNameBox = (EditText) findViewById(R.id.inputUserName);
 		mPasswordBox = (EditText) findViewById(R.id.inputPassword);
-		
+		mFullNameBox = (EditText) findViewById(R.id.fullName);
 	}
 
 	@Override
@@ -82,11 +86,14 @@ public class Authenticate extends Activity implements OnClickListener {
 	public void onClick(View button) {
 		if (button.getId() == R.id.loginButton) {
 
-/*			mUserName = mUserNameBox.getText().toString();
-			mPassword = mPasswordBox.getText().toString();*/
-			mUserName = "enana";
-			mPassword = "fUcktbs!1!";
 			mUserName = mUserNameBox.getText().toString();
+			mPassword = mPasswordBox.getText().toString();
+/*			mUserName = "enana";
+			mPassword = "fUcktbs!1!";*/
+			Log.w("username", mUserName);
+			Log.w("password", mPassword);
+			mUserName = mUserNameBox.getText().toString();
+			mFullName = mFullNameBox.getText().toString();
 			login();
 		}
 	}
@@ -146,10 +153,10 @@ public class Authenticate extends Activity implements OnClickListener {
 	
 	public void launchGetClasses() {
 		//store the user name in preferences for later reference
-        
         SharedPreferences prefs = this.getSharedPreferences(USER_NAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(USER_NAME, mUserName);
-		
+		prefs.edit().putString(USER_NAME, mUserName).apply();
+		String fullName = mFullName.trim();
+		prefs.edit().putString(FULL_NAME, fullName).apply();
         Intent launchGetClasses = new Intent(this,GetClasses.class);
         
         //pass on the cookie
@@ -158,6 +165,7 @@ public class Authenticate extends Activity implements OnClickListener {
 		//store the response
 		launchGetClasses.putExtra(LOGIN_RESPONSE, mLoginResponse);
 		
+		Log.w("fullname", prefs.getString(FULL_NAME, "no full name"));
 		startActivity(launchGetClasses);
 	}
 	public void login() {

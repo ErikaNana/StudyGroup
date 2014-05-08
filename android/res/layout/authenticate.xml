@@ -66,41 +66,21 @@
           android:orientation="horizontal"
           android:gravity="center">
               <TextView
-                  android:id = "@+id/firstNameLabel"
+                  android:id = "@+id/nameLabel"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
-                  android:text="@string/firstNameLabel"
+                  android:text="@string/nameLabel"
                   android:textSize="@dimen/textSize"/>
                   <EditText
-                      android:id="@+id/firstName"
+                      android:id="@+id/fullName"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:inputType="text"
-                      android:hint="@string/firstNameHint"
+                      android:hint="@string/nameHint"
                       android:textSize="@dimen/textSize" >
                   </EditText>
         </LinearLayout>
 
-        <LinearLayout
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal"
-          android:gravity="center">
-              <TextView
-                  android:id = "@+id/lastNameLabel"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:text="@string/lastNameLabel"
-                  android:textSize="@dimen/textSize"/>
-                  <EditText
-                      android:id="@+id/lastName"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:inputType="text"
-                      android:hint="@string/LastNameHint"
-                      android:textSize="@dimen/textSize" >
-                  </EditText>
-        </LinearLayout>
         <Button
             android:id="@+id/loginButton"
             android:layout_width="wrap_content"
