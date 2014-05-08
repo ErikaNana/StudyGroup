@@ -52,11 +52,13 @@ class StaticController < ApplicationController
     #creates the student and their schedule
     def display_schedule
         schedule = params[:userSchedule]
+        @master_name = schedule[:masterName]
         @user = schedule[:user]
 
         # [{name: name, courseInfo: [{day: days, time: times}, {day: days}, time: times]}]
         courses = schedule[:courses]
         schedule = ""
+
 
         #create course objects
         @courseArray = Array.new
@@ -91,10 +93,9 @@ class StaticController < ApplicationController
                 @courseArray.push(add_course)
             end
         end
-        #create the student
+        #create the student (one who created the group)
         schedule.chop!
-        #need to get master user's name --> CHANGE THIS LATER
-        name = "TEST STUDENT"
-        @student = Student.create(name: name, schedule: schedule, email: @user, student_type: "android")
+
+        @student = Student.create(name: @master_name, schedule: schedule, email: @user, student_type: "android")
     end
 end
