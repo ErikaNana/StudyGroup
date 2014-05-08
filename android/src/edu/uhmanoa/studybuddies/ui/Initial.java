@@ -21,14 +21,21 @@ public class Initial extends Activity {
 		TextView authenticate = (TextView) findViewById(R.id.authenticate);
 		SharedPreferences prefs = this.getSharedPreferences(FIRST_USE, Context.MODE_PRIVATE);
 		//for debugging
-		prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
-		prefs.edit().putString(Authenticate.USER_NAME, "enana").apply();
+		prefs.edit().putBoolean(Initial.FIRST_USE, true).apply();
+/*		prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
+		prefs.edit().putString(Authenticate.USER_NAME, "enana").apply();*/
 		//use a default value if there is none
 		boolean firstUse = prefs.getBoolean(FIRST_USE, true);
+		
+		Log.w("Initial","first use:  " + firstUse);
+		//debugging
+		prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
 		
 		//check to see if this is the user's first time in the app
 		if (firstUse) {
 			authenticate.setText("I'm a first time user!");
+			//update prefs
+			prefs.edit().putBoolean(Initial.FIRST_USE, false).apply();
 			Intent launchAuthenticate = new Intent(this,Authenticate.class);
 			startActivity(launchAuthenticate);
 			//don't want to be accessed by back button

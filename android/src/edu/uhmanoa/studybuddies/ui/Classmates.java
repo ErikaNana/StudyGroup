@@ -252,7 +252,7 @@ public class Classmates extends Activity{
 				public void sendResponseMessage(HttpResponse response) throws IOException {
 					HttpEntity entity = response.getEntity();
 					String responseString = EntityUtils.toString(entity);
-/*					printThis(responseString);*/
+					printThis(responseString);
 				}
 				@Override
 				public void sendProgressMessage(int arg0, int arg1) {

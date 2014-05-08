@@ -84,7 +84,7 @@ public class Authenticate extends Activity implements OnClickListener {
 
 /*			mUserName = mUserNameBox.getText().toString();
 			mPassword = mPasswordBox.getText().toString();*/
-/*			mUserName = "enana";*/
+			mUserName = "enana";
 			mPassword = "fUcktbs!1!";
 			mUserName = mUserNameBox.getText().toString();
 			login();

@@ -333,7 +333,6 @@ public class GetClasses extends Activity {
 					Log.w("GET_STUDENTS", "got student count"  + gotStudent);
 					if (gotStudent == courses.keySet().size()) {
 						pd.dismiss();
-						classmatesDb.close();
 						//launch home screen and show the click a class to get started view
 						launchHome();					
 					}
@@ -360,7 +359,6 @@ public class GetClasses extends Activity {
 		for (Classmate student: students) {
 			Log.w("students", student.toString());
 		}
-		classmatesDb.close();
 	}
 	public void addClassmates(ArrayList<Classmate> classmates) {		
 		Log.w("HERE", "Adding Classmates");
@@ -616,7 +614,6 @@ public class GetClasses extends Activity {
 		gsonBuilder.setPrettyPrinting();
 		Gson gson = gsonBuilder.create();
 		
-		coursesDb.close();
 		//string formatted json
 		Log.w("schedule json", gson.toJson(json));
 		return gson.toJson(json);
@@ -697,5 +694,12 @@ public class GetClasses extends Activity {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		coursesDb.close();
+		classmatesDb.close();
 	}
 }

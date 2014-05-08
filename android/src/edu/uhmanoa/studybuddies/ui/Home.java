@@ -47,7 +47,7 @@ public class Home extends Activity implements OnClickListener{
 			
 		createGroup.setOnClickListener(this);
 		viewGroups.setOnClickListener(this);
-		setTest();
+		//setTest();
 	}
 	
 	public void setTest() {
