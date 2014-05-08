@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140508052151) do
+ActiveRecord::Schema.define(version: 20140508064843) do
+
+  create_table "confirmed_groups", force: true do |t|
+    t.string   "name"
+    t.string   "members"
+    t.string   "master"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "courses", force: true do |t|
     t.string   "name"

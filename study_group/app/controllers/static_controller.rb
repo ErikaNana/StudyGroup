@@ -32,8 +32,11 @@ class StaticController < ApplicationController
         group_members.chop!
 
         #need to do error checking on this later
-        #construct the group
-        @group = InvitedGroup.create(name: @course.name + @master.name, members: group_members, master: @master.name)
+        #construct the invited group
+        @invited_group = InvitedGroup.create(name: @course.name + @master.name, members: group_members, master: @master.name)
+
+        #initialize the confirmed group
+        @confirmed_group = ConfirmedGroups.create(name: @course.name + @master.name, members: "", master: @master.name)
 
         #invite the members
         @invitees = Array.new
