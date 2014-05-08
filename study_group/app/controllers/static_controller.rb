@@ -8,10 +8,19 @@ class StaticController < ApplicationController
 
     def accept_invitation
         @group_name = params[:group_name]
+        @invitee = params[:invitee]
+        @invited_group = InvitedGroup.find_by_name(@group_name)
+        @confirmed_group = ConfirmedGroups.find_by_name(@group_name)
+        #add a member to the confirmed group
+        #delete a member from the invited group
+        @updated_invited_group = InvitedGroup.find_by_name(@group_name).delete_member(@invitee)
+        #send notification to Android app
     end
 
     def deny_invitation
         @group_name = params[:group_name]
+        #delete the member from the invited group
+        #send notification to Android app
     end
 
     def display_group_formation

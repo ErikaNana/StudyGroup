@@ -19,12 +19,13 @@ class InvitedGroup < ActiveRecord::Base
         #convert back to string
         updated_members = ""
         student_array_members.each do |student|
-            updated_members = updated_members + student + ","
+            updated_members = updated_members + student.email + ","
         end
         #remove last comma
         updated_members.chop!
 
         #update
         self.update(members: updated_members)
+        return self
     end
 end
