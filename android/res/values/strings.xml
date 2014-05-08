@@ -21,5 +21,9 @@
     <string name="view_groups">View Groups</string>
     <string name="title_activity_view_group">ViewGroup</string>
     <string name="title_activity_view_group_class">ViewGroupClass</string>
+    <string name ="firstNameLabel">First Name:  </string>
+    <string name = "lastNameLabel">Last Name:  </string>
+    <string name = "firstNameHint">First Name</string>
+    <string name = "LastNameHint">Last Name</string>
 
 </resources>
