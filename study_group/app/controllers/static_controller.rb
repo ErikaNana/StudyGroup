@@ -10,6 +10,10 @@ class StaticController < ApplicationController
         @group_name = params[:group_name]
     end
 
+    def deny_invitation
+        @group_name = params[:group_name]
+    end
+
     def display_group_formation
         #for now
         info = params[:createGroup]
